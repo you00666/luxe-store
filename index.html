@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUXESHOP | 现代极客电商品牌</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#0284c7',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            900: '#0c4a6e',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Glassmorphism Styling */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .dark-glass {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-full flex flex-col antialiased selection:bg-sky-500 selection:text-white">
+
+    <!-- Top Bar Notice -->
+    <div class="bg-slate-900 text-white text-xs py-2 px-4 text-center tracking-wide font-medium flex justify-between items-center px-6">
+        <span>🎉 全场满 ¥299 包邮 | 使用优惠券 <code class="bg-slate-800 px-1.5 py-0.5 rounded text-sky-400">LUXE2026</code> 立减 50 元</span>
+        <button onclick="openAdminAuth()" class="hover:underline text-slate-300 hover:text-white flex items-center gap-1">
+            <i class="fa-solid fa-user-shield text-xs"></i> 商家后台管理
+        </button>
+    </div>
+
+    <!-- Main Navigation Header -->
+    <header class="sticky top-0 z-30 glass-panel border-b border-slate-200/80 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 gap-4">
+                
+                <!-- Logo -->
+                <div class="flex items-center gap-2 cursor-pointer" onclick="resetFilters()">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 to-indigo-600 flex items-center justify-center text-white font-black text-xl shadow-md shadow-sky-500/20">
+                        L
+                    </div>
+                    <div>
+                        <span class="text-xl font-bold tracking-tight text-slate-900">LUXE<span class="text-sky-600">STORE</span></span>
+                        <span class="text-[10px] block text-slate-400 font-medium -mt-1 tracking-widest">PREMIUM DIGITAL</span>
+                    </div>
+                </div>
+
+                <!-- Search Bar -->
+                <div class="flex-1 max-w-md mx-4 hidden md:block">
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" id="searchInput" oninput="handleSearch()" placeholder="搜索数码产品、配件、旗舰单品..." 
+                            class="w-full pl-10 pr-4 py-2 bg-slate-100/80 border border-transparent focus:border-sky-500 focus:bg-white rounded-full text-sm transition-all outline-none">
+                    </div>
+                </div>
+
+                <!-- Right Action Icons -->
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <!-- Mobile Search Trigger -->
+                    <button onclick="toggleMobileSearch()" class="p-2 text-slate-600 hover:text-sky-600 md:hidden rounded-full hover:bg-slate-100">
+                        <i class="fa-solid fa-magnifying-glass text-lg"></i>
+                    </button>
+
+                    <!-- Wishlist Button -->
+                    <button onclick="toggleWishlistModal()" class="relative p-2 text-slate-600 hover:text-rose-500 transition-colors rounded-full hover:bg-slate-100">
+                        <i class="fa-regular fa-heart text-xl"></i>
+                        <span id="wishlistBadge" class="hidden absolute -top-0.5 -right-0.5 bg-rose-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
+                    </button>
+
+                    <!-- Cart Button -->
+                    <button onclick="toggleCartDrawer()" class="relative bg-slate-900 hover:bg-sky-600 text-white px-4 py-2 rounded-full font-medium text-sm flex items-center gap-2 transition-all shadow-md">
+                        <i class="fa-solid fa-bag-shopping"></i>
+                        <span class="hidden sm:inline">购物车</span>
+                        <span id="cartCountBadge" class="bg-sky-500 text-white text-xs font-bold px-1.5 py-0.2 rounded-full min-w-[20px]">0</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Search Bar (Expandable) -->
+            <div id="mobileSearchContainer" class="hidden pb-3 md:hidden">
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input type="text" id="mobileSearchInput" oninput="handleSearch(true)" placeholder="搜索商品..." 
+                        class="w-full pl-10 pr-4 py-2 bg-slate-100 border border-slate-200 rounded-full text-sm outline-none">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        
+        <!-- Hero Banner Slide -->
+        <div class="relative rounded-3xl overflow-hidden bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 text-white p-8 md:p-12 mb-8 shadow-xl">
+            <div class="absolute inset-0 opacity-20 bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:16px_16px]"></div>
+            <div class="relative z-10 max-w-xl">
+                <span class="inline-block px-3 py-1 bg-sky-500/20 text-sky-400 border border-sky-500/30 text-xs font-semibold rounded-full mb-4">2026 新品季开幕</span>
+                <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight mb-4 leading-tight">重新定义你的<br/><span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-indigo-300">数字科技生活</span></h1>
+                <p class="text-slate-300 text-sm md:text-base mb-6 leading-relaxed">探索精选旗舰数码装备，立享限时惊喜特惠。GitHub Pages 快速部署版示例商店。</p>
+                <a href="#productList" class="inline-flex items-center gap-2 bg-sky-500 hover:bg-sky-400 text-white font-semibold px-6 py-3 rounded-xl transition-all shadow-lg shadow-sky-500/25">
+                    立即选购 <i class="fa-solid fa-arrow-right text-sm"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Filter Controls -->
+        <div id="productList" class="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between mb-6">
+            
+            <!-- Category Tabs -->
+            <div class="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 no-scrollbar" id="categoryTabs">
+                <!-- Dynamically populated categories -->
+            </div>
+
+            <!-- Sort and Filter Controls -->
+            <div class="flex items-center gap-3 w-full md:w-auto justify-end">
+                <label class="text-xs text-slate-500 whitespace-nowrap">排序方式:</label>
+                <select id="sortSelect" onchange="renderProducts()" class="bg-white border border-slate-200 text-slate-700 text-sm rounded-xl px-3 py-2 outline-none focus:border-sky-500 shadow-sm cursor-pointer">
+                    <option value="default">默认推荐</option>
+                    <option value="price-low">价格从低到高</option>
+                    <option value="price-high">价格从高到低</option>
+                    <option value="rating">高评分优先</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Active Filter Indicator -->
+        <div id="filterStatus" class="hidden mb-4 flex items-center gap-2 text-sm text-slate-500">
+            <span>找到结果:</span>
+            <span id="resultCount" class="font-bold text-slate-800">0</span>
+            <button onclick="resetFilters()" class="text-xs text-sky-600 hover:underline ml-2">清除筛选</button>
+        </div>
+
+        <!-- Product Grid -->
+        <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <!-- Dynamically populated product cards -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden text-center py-16">
+            <i class="fa-solid fa-box-open text-5xl text-slate-300 mb-4"></i>
+            <h3 class="text-lg font-medium text-slate-600">没有找到匹配的商品</h3>
+            <p class="text-slate-400 text-sm mt-1">请尝试搜索其他关键字或切换分类</p>
+            <button onclick="resetFilters()" class="mt-4 px-4 py-2 bg-slate-800 text-white text-sm rounded-xl hover:bg-slate-700">重置筛选项</button>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-16 py-12 text-slate-500 text-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+                <div class="flex items-center gap-2 mb-4">
+                    <div class="w-8 h-8 rounded-lg bg-sky-600 flex items-center justify-center text-white font-bold">L</div>
+                    <span class="text-lg font-bold text-slate-800">LUXESTORE</span>
+                </div>
+                <p class="text-xs text-slate-400 leading-relaxed mb-4">基于纯 HTML/CSS/JS 构建的现代化静态电商，完全适配 GitHub Pages 静态托管与 localStorage 持久化。</p>
+            </div>
+            <div>
+                <h4 class="font-semibold text-slate-800 mb-3">购物指南</h4>
+                <ul class="space-y-2 text-xs">
+                    <li><a href="#" class="hover:text-sky-600">常见问题</a></li>
+                    <li><a href="#" class="hover:text-sky-600">配送与付款</a></li>
+                    <li><a href="#" class="hover:text-sky-600">退换货政策</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-semibold text-slate-800 mb-3">平台功能</h4>
+                <ul class="space-y-2 text-xs">
+                    <li><a href="javascript:void(0)" onclick="openAdminAuth()" class="hover:text-sky-600">管理后台 (密码: admin123)</a></li>
+                    <li><a href="javascript:void(0)" onclick="exportProductsData()" class="hover:text-sky-600">导出商品 JSON</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-semibold text-slate-800 mb-3">技术支持</h4>
+                <p class="text-xs text-slate-400 mb-2">可直接分叉 (Fork) 本仓库部署至个人 GitHub Pages 站点。</p>
+                <div class="flex gap-3 text-lg text-slate-400">
+                    <i class="fa-brands fa-github hover:text-slate-800 cursor-pointer"></i>
+                    <i class="fa-brands fa-weixin hover:text-emerald-600 cursor-pointer"></i>
+                </div>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-slate-100 mt-8 pt-6 text-center text-xs text-slate-400">
+            &copy; 2026 LUXESTORE. All rights reserved. Powered by Static Pure JavaScript.
+        </div>
+    </footer>
+
+    <!-- Wishlist Modal -->
+    <div id="wishlistModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex justify-center items-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl relative max-h-[80vh] flex flex-col">
+            <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
+                <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-heart text-rose-500"></i> 我的心愿单</h3>
+                <button onclick="toggleWishlistModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div id="wishlistItems" class="flex-grow overflow-y-auto space-y-3">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Detail Modal -->
+    <div id="productDetailModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex justify-center items-center p-4">
+        <div class="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl relative overflow-hidden max-h-[90vh] overflow-y-auto">
+            <button onclick="closeProductDetail()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 bg-slate-100 w-8 h-8 rounded-full flex items-center justify-center z-10"><i class="fa-solid fa-xmark"></i></button>
+            <div id="productDetailContent" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Shopping Cart Drawer Overlay -->
+    <div id="cartDrawerOverlay" onclick="toggleCartDrawer()" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 hidden transition-opacity"></div>
+
+    <!-- Shopping Cart Drawer -->
+    <div id="cartDrawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-white z-50 shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col">
+        <div class="p-4 sm:p-6 border-b border-slate-100 flex justify-between items-center">
+            <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-bag-shopping text-sky-600"></i> 购物车商品
+            </h2>
+            <button onclick="toggleCartDrawer()" class="text-slate-400 hover:text-slate-600 p-1"><i class="fa-solid fa-xmark text-xl"></i></button>
+        </div>
+
+        <!-- Cart Items List -->
+        <div id="cartItemsContainer" class="flex-grow overflow-y-auto p-4 sm:p-6 space-y-4">
+            <!-- Dynamically populated -->
+        </div>
+
+        <!-- Coupon & Price Summary -->
+        <div class="p-4 sm:p-6 border-t border-slate-100 bg-slate-50 space-y-3">
+            <div class="flex gap-2">
+                <input type="text" id="couponInput" placeholder="输入优惠券 (如: LUXE2026)" class="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none focus:border-sky-500 uppercase">
+                <button onclick="applyCoupon()" class="bg-slate-800 text-white text-xs px-3 py-1.5 rounded-xl hover:bg-slate-700 transition-colors">使用</button>
+            </div>
+            <div id="couponMessage" class="text-[11px] hidden"></div>
+
+            <div class="space-y-1.5 text-xs text-slate-600 pt-2 border-t border-slate-200">
+                <div class="flex justify-between">
+                    <span>商品小计</span>
+                    <span id="cartSubtotal" class="font-semibold text-slate-800">¥0.00</span>
+                </div>
+                <div class="flex justify-between text-emerald-600 hidden" id="discountRow">
+                    <span>优惠券折扣</span>
+                    <span id="cartDiscount">-¥0.00</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>预估运费</span>
+                    <span id="shippingFee" class="text-slate-800 font-semibold">免运费</span>
+                </div>
+                <div class="flex justify-between text-base font-bold text-slate-900 pt-2 border-t border-slate-200">
+                    <span>合计金额</span>
+                    <span id="cartTotal" class="text-sky-600">¥0.00</span>
+                </div>
+            </div>
+
+            <button onclick="openCheckoutModal()" id="checkoutBtn" disabled class="w-full bg-sky-600 hover:bg-sky-500 disabled:bg-slate-300 text-white font-semibold py-3 rounded-xl transition-all shadow-md text-sm mt-2">
+                前往结算
+            </button>
+        </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div id="checkoutModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex justify-center items-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
+                <h3 class="text-lg font-bold text-slate-800">模拟订单结算</h3>
+                <button onclick="closeCheckoutModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            
+            <form id="checkoutForm" onsubmit="handleCheckout(event)" class="space-y-4 text-xs">
+                <div>
+                    <label class="block font-medium text-slate-700 mb-1">收货人姓名</label>
+                    <input type="text" required class="w-full border border-slate-200 rounded-xl px-3 py-2 outline-none focus:border-sky-500">
+                </div>
+                <div>
+                    <label class="block font-medium text-slate-700 mb-1">联系电话</label>
+                    <input type="tel" required class="w-full border border-slate-200 rounded-xl px-3 py-2 outline-none focus:border-sky-500">
+                </div>
+                <div>
+                    <label class="block font-medium text-slate-700 mb-1">收货地址</label>
+                    <textarea required rows="2" class="w-full border border-slate-200 rounded-xl px-3 py-2 outline-none focus:border-sky-500"></textarea>
+                </div>
+                <div>
+                    <label class="block font-medium text-slate-700 mb-1">支付方式</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <label class="border border-slate-200 p-2.5 rounded-xl flex items-center gap-2 cursor-pointer hover:bg-slate-50">
+                            <input type="radio" name="payment" value="alipay" checked class="text-sky-600">
+                            <span class="font-medium text-slate-800">支付宝支付</span>
+                        </label>
+                        <label class="border border-slate-200 p-2.5 rounded-xl flex items-center gap-2 cursor-pointer hover:bg-slate-50">
+                            <input type="radio" name="payment" value="wechat" class="text-sky-600">
+                            <span class="font-medium text-slate-800">微信支付</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="bg-slate-50 p-3 rounded-xl space-y-1">
+                    <div class="flex justify-between text-slate-600"><span>应付金额:</span> <span id="checkoutTotalAmount" class="font-bold text-sky-600 text-sm">¥0.00</span></div>
+                </div>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 rounded-xl transition-all shadow-md text-sm">
+                    确认支付并下单
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Authentication Modal -->
+    <div id="adminAuthModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 hidden flex justify-center items-center p-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl text-center">
+            <div class="w-12 h-12 bg-sky-100 text-sky-600 rounded-2xl flex items-center justify-center mx-auto mb-4 text-xl">
+                <i class="fa-solid fa-lock"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-800 mb-1">管理员身份验证</h3>
+            <p class="text-xs text-slate-400 mb-4">默认初始密码：<code class="bg-slate-100 px-1 py-0.5 rounded text-sky-600">admin123</code></p>
+            <input type="password" id="adminPasswordInput" placeholder="请输入后台管理密码" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm mb-4 outline-none focus:border-sky-500 text-center">
+            <div id="adminAuthError" class="text-rose-500 text-xs mb-3 hidden">密码不正确，请重试</div>
+            <div class="flex gap-2">
+                <button onclick="closeAdminAuth()" class="flex-1 border border-slate-200 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50">取消</button>
+                <button onclick="verifyAdminPassword()" class="flex-1 bg-sky-600 hover:bg-sky-500 text-white py-2 rounded-xl text-xs font-semibold">登录后台</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Management Panel Overlay/Modal -->
+    <div id="adminPanelModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 hidden flex justify-center items-center p-4 md:p-8">
+        <div class="bg-white rounded-3xl w-full max-w-6xl h-[90vh] shadow-2xl flex flex-col overflow-hidden">
+            
+            <!-- Admin Header -->
+            <div class="bg-slate-900 text-white px-6 py-4 flex justify-between items-center border-b border-slate-800">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-sliders text-sky-400 text-lg"></i>
+                    <div>
+                        <h2 class="font-bold text-base leading-none">LUXE 商城 - 商家管理后台</h2>
+                        <span class="text-[10px] text-slate-400">LocalStorage 数据持久化 & 管理面板</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="exportProductsData()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs px-3 py-1.5 rounded-lg border border-slate-700 flex items-center gap-1.5">
+                        <i class="fa-solid fa-download"></i> 导出商品 JSON
+                    </button>
+                    <label class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs px-3 py-1.5 rounded-lg border border-slate-700 cursor-pointer flex items-center gap-1.5">
+                        <i class="fa-solid fa-upload"></i> 导入商品 JSON
+                        <input type="file" id="importJsonInput" accept=".json" onchange="importProductsData(event)" class="hidden">
+                    </label>
+                    <button onclick="closeAdminPanel()" class="text-slate-400 hover:text-white ml-2"><i class="fa-solid fa-xmark text-xl"></i></button>
+                </div>
+            </div>
+
+            <!-- Admin Body (Split View) -->
+            <div class="flex-grow flex flex-col md:flex-row overflow-hidden">
+                
+                <!-- Admin Product Form -->
+                <div class="w-full md:w-80 bg-slate-50 border-r border-slate-200 p-5 overflow-y-auto space-y-4">
+                    <h3 class="font-bold text-slate-800 text-sm border-b border-slate-200 pb-2 flex justify-between items-center">
+                        <span id="formTitle">新增商品</span>
+                        <button onclick="resetAdminForm()" class="text-xs text-sky-600 font-normal hover:underline">清空表单</button>
+                    </h3>
+                    
+                    <form id="productForm" onsubmit="handleProductSubmit(event)" class="space-y-3 text-xs">
+                        <input type="hidden" id="editProductId">
+                        
+                        <div>
+                            <label class="block font-medium text-slate-700 mb-1">商品名称 *</label>
+                            <input type="text" id="adminTitle" required placeholder="如：AirPods Pro 3" class="w-full border border-slate-200 rounded-xl px-3 py-2 outline-none focus:border-sky-500">
+                        </div>
+
+                        <div>
+                            <label class="block font-medium text-slate-700 mb-1">分类 *</label>
+                            <input type="text" id="adminCategory" required placeholder="如：音频, 手机, 电脑配件" class="w-full border border-slate-200 rounded-xl px-3 py-2 outline-none focus:border-sky-500">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block font-medium text-slate-700 mb-1">价格 (¥) *</label>
+                                <input type="number" step="0.01" id="adminPrice" required placeholder="1299" class="w-full border border-slate-200 rounded-xl px-3 py-2 outline-none focus:border-sky-500">
+                            </div>
+                            <div>
+                                <label class="block font-medium text-slate-700 mb-1">库存 *</label>
+                                <input type="number" id="adminStock" required placeholder="50" class="w-full border border-slate-200 rounded-xl px-3 py-2 outline-none focus:border-sky-500">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block font-medium text-slate-700 mb-1">商品图片 URL *</label>
+                            <input type="url" id="adminImage" required placeholder="https://images.unsplash.com/..." class="w-full border border-slate-200 rounded-xl px-3 py-2 outline-none focus:border-sky-500">
+                        </div>
+
+                        <div>
+                            <label class="block font-medium text-slate-700 mb-1">商品简介描述</label>
+                            <textarea id="adminDescription" rows="3" placeholder="详细规格或卖点说明..." class="w-full border border-slate-200 rounded-xl px-3 py-2 outline-none focus:border-sky-500"></textarea>
+                        </div>
+
+                        <div class="flex items-center gap-2 pt-1">
+                            <input type="checkbox" id="adminInStock" checked class="rounded text-sky-600">
+                            <label for="adminInStock" class="font-medium text-slate-700 cursor-pointer">允许在线上架销售</label>
+                        </div>
+
+                        <button type="submit" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-semibold py-2.5 rounded-xl transition-all shadow-md mt-2">
+                            保存商品数据
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Admin Product Table -->
+                <div class="flex-1 p-5 overflow-y-auto">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-slate-800 text-sm">库存商品列表 (<span id="adminTotalCount">0</span>)</h3>
+                        <button onclick="restoreDefaultData()" class="text-xs text-rose-600 border border-rose-200 px-2.5 py-1 rounded-lg hover:bg-rose-50">
+                            <i class="fa-solid fa-rotate-left"></i> 恢复初始示例数据
+                        </button>
+                    </div>
+
+                    <div class="overflow-x-auto border border-slate-200 rounded-2xl shadow-sm">
+                        <table class="w-full text-left text-xs text-slate-600">
+                            <thead class="bg-slate-100 border-b border-slate-200 font-semibold text-slate-700 uppercase">
+                                <tr>
+                                    <th class="p-3">商品</th>
+                                    <th class="p-3">分类</th>
+                                    <th class="p-3">价格</th>
+                                    <th class="p-3">库存</th>
+                                    <th class="p-3">状态</th>
+                                    <th class="p-3 text-right">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminProductTableBody" class="divide-y divide-slate-100">
+                                <!-- Dynamically populated table rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Default Mock Data for initial load
+        const DEFAULT_PRODUCTS = [
+            {
+                id: 'p1',
+                title: 'LuxeSound Pro 降噪头戴耳机',
+                category: '音频配件',
+                price: 1899.00,
+                stock: 25,
+                inStock: true,
+                rating: 4.9,
+                image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&auto=format&fit=crop&q=80',
+                description: '行业领先的自适应主动降噪技术，高解析度音频驱动单元，配合单次充电长达 30 小时续航。'
+            },
+            {
+                id: 'p2',
+                title: 'Ultra Watch Series X 智能手表',
+                category: '智能穿戴',
+                price: 3299.00,
+                stock: 12,
+                inStock: true,
+                rating: 4.8,
+                image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&auto=format&fit=crop&q=80',
+                description: '航天级钛金属边框，蓝宝石玻璃镜面，精准心率与血氧监测，支持独立蜂窝网络通信。'
+            },
+            {
+                id: 'p3',
+                title: 'ErgoMech 机械键盘 Wireless',
+                category: '电脑配件',
+                price: 799.00,
+                stock: 40,
+                inStock: true,
+                rating: 4.7,
+                image: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=600&auto=format&fit=crop&q=80',
+                description: '人体工学客制化轴体，三模无线连接（蓝牙/2.4G/有线），RGB 炫彩背光与PBT双色键帽。'
+            },
+            {
+                id: 'p4',
+                title: 'PixelLens 4K 极清便携显示器',
+                category: '电脑配件',
+                price: 1599.00,
+                stock: 8,
+                inStock: true,
+                rating: 4.6,
+                image: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=600&auto=format&fit=crop&q=80',
+                description: '15.6 英寸 IPS 4K HDR 全高清触控屏，Type-C 一线通连接，适合办公设计与次世代游戏拓展。'
+            },
+            {
+                id: 'p5',
+                title: 'AuraBook Air 14 轻薄笔记本',
+                category: '电脑整机',
+                price: 6499.00,
+                stock: 15,
+                inStock: true,
+                rating: 4.9,
+                image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=600&auto=format&fit=crop&q=80',
+                description: '全新高性能芯片，极轻薄全铝合金机身，全面屏设计与长达 18 小时的全天候电池续航。'
+            },
+            {
+                id: 'p6',
+                title: 'SonicBuds 真无线降噪耳机',
+                category: '音频配件',
+                price: 599.00,
+                stock: 60,
+                inStock: true,
+                rating: 4.5,
+                image: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600&auto=format&fit=crop&q=80',
+                description: '舒适入耳设计，支持空间音频与IPX5级防水，附带无线充电仓。'
+            }
+        ];
+
+        // State variables
+        let products = [];
+        let cart = [];
+        let wishlist = [];
+        let currentCategory = 'all';
+        let searchQuery = '';
+        let activeDiscount = 0; // Discount in RMB
+        let adminPassword = 'admin123'; // Initial default password
+
+        // Initialize App on DOM Loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStateFromStorage();
+            renderCategories();
+            renderProducts();
+            updateCartUI();
+            updateWishlistUI();
+        });
+
+        function loadStateFromStorage() {
+            // Load Products
+            const storedProducts = localStorage.getItem('luxestore_products');
+            if (storedProducts) {
+                try {
+                    products = JSON.parse(storedProducts);
+                } catch (e) {
+                    products = [...DEFAULT_PRODUCTS];
+                }
+            } else {
+                products = [...DEFAULT_PRODUCTS];
+                saveProductsToStorage();
+            }
+
+            // Load Cart
+            const storedCart = localStorage.getItem('luxestore_cart');
+            if (storedCart) {
+                try { cart = JSON.parse(storedCart); } catch (e) { cart = []; }
+            }
+
+            // Load Wishlist
+            const storedWishlist = localStorage.getItem('luxestore_wishlist');
+            if (storedWishlist) {
+                try { wishlist = JSON.parse(storedWishlist); } catch (e) { wishlist = []; }
+            }
+
+            // Load Password
+            const storedPass = localStorage.getItem('luxestore_admin_pass');
+            if (storedPass) adminPassword = storedPass;
+        }
+
+        function saveProductsToStorage() {
+            localStorage.setItem('luxestore_products', JSON.stringify(products));
+        }
+
+        function saveCartToStorage() {
+            localStorage.setItem('luxestore_cart', JSON.stringify(cart));
+        }
+
+        function saveWishlistToStorage() {
+            localStorage.setItem('luxestore_wishlist', JSON.stringify(wishlist));
+        }
+
+        function getCategories() {
+            const categories = new Set(products.map(p => p.category));
+            return ['all', ...Array.from(categories)];
+        }
+
+        function renderCategories() {
+            const container = document.getElementById('categoryTabs');
+            const categories = getCategories();
+            
+            container.innerHTML = categories.map(cat => {
+                const label = cat === 'all' ? '全部商品' : cat;
+                const activeClass = currentCategory === cat 
+                    ? 'bg-slate-900 text-white font-medium shadow-sm' 
+                    : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200';
+                return `
+                    <button onclick="setCategory('${cat}')" class="px-4 py-1.5 rounded-full text-xs transition-all whitespace-nowrap ${activeClass}">
+                        ${label}
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function setCategory(cat) {
+            currentCategory = cat;
+            renderCategories();
+            renderProducts();
+        }
+
+        function handleSearch(isMobile = false) {
+            const input = isMobile ? document.getElementById('mobileSearchInput') : document.getElementById('searchInput');
+            searchQuery = input.value.trim().toLowerCase();
+            renderProducts();
+        }
+
+        function resetFilters() {
+            currentCategory = 'all';
+            searchQuery = '';
+            document.getElementById('searchInput').value = '';
+            document.getElementById('mobileSearchInput').value = '';
+            document.getElementById('sortSelect').value = 'default';
+            renderCategories();
+            renderProducts();
+        }
+
+        function renderProducts() {
+            const grid = document.getElementById('productGrid');
+            const emptyState = document.getElementById('emptyState');
+            const filterStatus = document.getElementById('filterStatus');
+            const resultCount = document.getElementById('resultCount');
+            const sortVal = document.getElementById('sortSelect').value;
+
+            // Filter logic
+            let filtered = products.filter(p => {
+                const matchCategory = currentCategory === 'all' || p.category === currentCategory;
+                const matchSearch = p.title.toLowerCase().includes(searchQuery) || 
+                                    p.category.toLowerCase().includes(searchQuery) ||
+                                    p.description.toLowerCase().includes(searchQuery);
+                return matchCategory && matchSearch && p.inStock;
+            });
+
+            // Sorting logic
+            if (sortVal === 'price-low') {
+                filtered.sort((a, b) => a.price - b.price);
+            } else if (sortVal === 'price-high') {
+                filtered.sort((a, b) => b.price - a.price);
+            } else if (sortVal === 'rating') {
+                filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+            }
+
+            // Update UI Counters
+            if (currentCategory !== 'all' || searchQuery !== '') {
+                filterStatus.classList.remove('hidden');
+                resultCount.innerText = filtered.length;
+            } else {
+                filterStatus.classList.add('hidden');
+            }
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            grid.innerHTML = filtered.map(p => {
+                const isWishlisted = wishlist.includes(p.id);
+                return `
+                    <div class="group bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
+                        <div class="relative aspect-square overflow-hidden bg-slate-100 cursor-pointer" onclick="openProductDetail('${p.id}')">
+                            <img src="${p.image}" alt="${p.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://placehold.co/600x600/f1f5f9/475569?text=Product'">
+                            <button onclick="event.stopPropagation(); toggleWishlist('${p.id}')" class="absolute top-3 right-3 w-8 h-8 rounded-full glass-panel flex items-center justify-center text-slate-600 hover:text-rose-500 transition-colors shadow-sm">
+                                <i class="${isWishlisted ? 'fa-solid text-rose-500' : 'fa-regular'} fa-heart"></i>
+                            </button>
+                            <span class="absolute bottom-3 left-3 bg-slate-900/80 text-white text-[10px] font-medium px-2.5 py-0.5 rounded-full backdrop-blur-md">
+                                ${p.category}
+                            </span>
+                        </div>
+                        <div class="p-4 flex-grow flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center gap-1 text-amber-400 text-xs mb-1">
+                                    <i class="fa-solid fa-star"></i>
+                                    <span class="font-bold text-slate-700">${p.rating || '4.8'}</span>
+                                    <span class="text-slate-400 font-normal">(${p.stock > 0 ? `存货:${p.stock}` : '已售罄'})</span>
+                                </div>
+                                <h3 onclick="openProductDetail('${p.id}')" class="font-bold text-slate-800 text-sm hover:text-sky-600 cursor-pointer line-clamp-1 transition-colors">${p.title}</h3>
+                                <p class="text-xs text-slate-400 line-clamp-2 mt-1 leading-relaxed">${p.description}</p>
+                            </div>
+                            <div class="flex items-center justify-between mt-4 pt-3 border-t border-slate-100">
+                                <div>
+                                    <span class="text-xs text-slate-400">RMB</span>
+                                    <span class="text-lg font-bold text-slate-900">¥${p.price.toFixed(2)}</span>
+                                </div>
+                                <button onclick="addToCart('${p.id}')" ${p.stock <= 0 ? 'disabled' : ''} class="bg-slate-100 hover:bg-sky-600 hover:text-white disabled:opacity-50 text-slate-800 p-2.5 rounded-xl transition-all flex items-center justify-center">
+                                    <i class="fa-solid fa-cart-plus text-sm"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function toggleWishlist(productId) {
+            const index = wishlist.indexOf(productId);
+            if (index > -1) {
+                wishlist.splice(index, 1);
+            } else {
+                wishlist.push(productId);
+            }
+            saveWishlistToStorage();
+            updateWishlistUI();
+            renderProducts();
+        }
+
+        function updateWishlistUI() {
+            const badge = document.getElementById('wishlistBadge');
+            if (wishlist.length > 0) {
+                badge.innerText = wishlist.length;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        function toggleWishlistModal() {
+            const modal = document.getElementById('wishlistModal');
+            const itemsContainer = document.getElementById('wishlistItems');
+            
+            if (modal.classList.contains('hidden')) {
+                const wishlistedProducts = products.filter(p => wishlist.includes(p.id));
+                if (wishlistedProducts.length === 0) {
+                    itemsContainer.innerHTML = '<p class="text-center text-slate-400 py-8 text-xs">心愿单为空，去添加一些商品吧！</p>';
+                } else {
+                    itemsContainer.innerHTML = wishlistedProducts.map(p => `
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                            <div class="flex items-center gap-3">
+                                <img src="${p.image}" class="w-12 h-12 rounded-lg object-cover">
+                                <div>
+                                    <h4 class="font-bold text-xs text-slate-800">${p.title}</h4>
+                                    <span class="text-xs text-sky-600 font-bold">¥${p.price.toFixed(2)}</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="addToCart('${p.id}')" class="bg-sky-600 text-white text-xs px-3 py-1 rounded-lg">加入购物车</button>
+                                <button onclick="toggleWishlist('${p.id}'); toggleWishlistModal()" class="text-slate-400 hover:text-rose-500 p-1"><i class="fa-solid fa-trash-can"></i></button>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function openProductDetail(id) {
+            const product = products.find(p => p.id === id);
+            if (!product) return;
+
+            const modal = document.getElementById('productDetailModal');
+            const container = document.getElementById('productDetailContent');
+            const isWishlisted = wishlist.includes(product.id);
+
+            container.innerHTML = `
+                <div class="rounded-2xl overflow-hidden bg-slate-100 aspect-square">
+                    <img src="${product.image}" class="w-full h-full object-cover">
+                </div>
+                <div class="flex flex-col justify-between">
+                    <div>
+                        <span class="bg-sky-100 text-sky-700 text-xs font-semibold px-2.5 py-1 rounded-md mb-2 inline-block">${product.category}</span>
+                        <h2 class="text-xl font-bold text-slate-900 mb-2">${product.title}</h2>
+                        <div class="flex items-center gap-2 text-xs text-amber-500 mb-4">
+                            <i class="fa-solid fa-star"></i>
+                            <span class="font-bold text-slate-800">${product.rating || '4.8'}</span>
+                            <span class="text-slate-400">| 库存状态: ${product.stock > 0 ? `充足 (${product.stock}件)` : '缺货'}</span>
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed mb-6">${product.description}</p>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold text-slate-900 mb-4">¥${product.price.toFixed(2)}</div>
+                        <div class="flex gap-3">
+                            <button onclick="addToCart('${product.id}')" ${product.stock <= 0 ? 'disabled' : ''} class="flex-1 bg-sky-600 hover:bg-sky-500 disabled:bg-slate-300 text-white font-semibold py-2.5 rounded-xl text-sm transition-all shadow-md">
+                                <i class="fa-solid fa-bag-shopping mr-1"></i> 加入购物车
+                            </button>
+                            <button onclick="toggleWishlist('${product.id}'); openProductDetail('${product.id}')" class="border border-slate-200 hover:bg-slate-50 text-slate-600 p-2.5 rounded-xl">
+                                <i class="${isWishlisted ? 'fa-solid text-rose-500' : 'fa-regular'} fa-heart text-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            modal.classList.remove('hidden');
+        }
+
+        function closeProductDetail() {
+            document.getElementById('productDetailModal').classList.add('hidden');
+        }
+
+        function toggleCartDrawer() {
+            const drawer = document.getElementById('cartDrawer');
+            const overlay = document.getElementById('cartDrawerOverlay');
+            const isHidden = drawer.classList.contains('translate-x-full');
+
+            if (isHidden) {
+                drawer.classList.remove('translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                drawer.classList.add('translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product || product.stock <= 0) return;
+
+            const cartItem = cart.find(item => item.id === productId);
+            if (cartItem) {
+                if (cartItem.qty < product.stock) {
+                    cartItem.qty++;
+                } else {
+                    alert('已达到最大库存限制！');
+                    return;
+                }
+            } else {
+                cart.push({ id: productId, qty: 1 });
+            }
+
+            saveCartToStorage();
+            updateCartUI();
+            
+            // Auto open cart drawer
+            const drawer = document.getElementById('cartDrawer');
+            if (drawer.classList.contains('translate-x-full')) {
+                toggleCartDrawer();
+            }
+        }
+
+        function updateCartQuantity(productId, delta) {
+            const index = cart.findIndex(item => item.id === productId);
+            if (index > -1) {
+                const product = products.find(p => p.id === productId);
+                cart[index].qty += delta;
+
+                if (cart[index].qty > product.stock) {
+                    cart[index].qty = product.stock;
+                    alert('已超出现有库存');
+                }
+
+                if (cart[index].qty <= 0) {
+                    cart.splice(index, 1);
+                }
+            }
+            saveCartToStorage();
+            updateCartUI();
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            saveCartToStorage();
+            updateCartUI();
+        }
+
+        function applyCoupon() {
+            const code = document.getElementById('couponInput').value.trim().toUpperCase();
+            const msg = document.getElementById('couponMessage');
+            if (code === 'LUXE2026') {
+                activeDiscount = 50.00;
+                msg.innerText = '✅ 优惠券使用成功！立减 ¥50.00';
+                msg.className = 'text-[11px] text-emerald-600 block';
+            } else {
+                activeDiscount = 0;
+                msg.innerText = '❌ 无效的优惠券代码';
+                msg.className = 'text-[11px] text-rose-500 block';
+            }
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const container = document.getElementById('cartItemsContainer');
+            const cartBadge = document.getElementById('cartCountBadge');
+            const subtotalEl = document.getElementById('cartSubtotal');
+            const totalEl = document.getElementById('cartTotal');
+            const discountRow = document.getElementById('discountRow');
+            const discountEl = document.getElementById('cartDiscount');
+            const checkoutBtn = document.getElementById('checkoutBtn');
+
+            const totalItemsCount = cart.reduce((sum, item) => sum + item.qty, 0);
+            cartBadge.innerText = totalItemsCount;
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 text-slate-400">
+                        <i class="fa-solid fa-basket-shopping text-4xl mb-3"></i>
+                        <p class="text-xs">购物车空空如也，快去选购吧！</p>
+                    </div>
+                `;
+                subtotalEl.innerText = '¥0.00';
+                totalEl.innerText = '¥0.00';
+                checkoutBtn.disabled = true;
+                return;
+            }
+
+            let subtotal = 0;
+            container.innerHTML = cart.map(item => {
+                const p = products.find(prod => prod.id === item.id);
+                if (!p) return '';
+                const itemTotal = p.price * item.qty;
+                subtotal += itemTotal;
+
+                return `
+                    <div class="flex gap-3 bg-slate-50 p-3 rounded-2xl border border-slate-100 items-center">
+                        <img src="${p.image}" class="w-16 h-16 rounded-xl object-cover bg-white">
+                        <div class="flex-1">
+                            <h4 class="font-bold text-xs text-slate-800 line-clamp-1">${p.title}</h4>
+                            <div class="text-sky-600 font-bold text-xs mt-0.5">¥${p.price.toFixed(2)}</div>
+                            <div class="flex items-center gap-2 mt-2">
+                                <div class="flex items-center border border-slate-200 rounded-lg bg-white">
+                                    <button onclick="updateCartQuantity('${p.id}', -1)" class="px-2 py-0.5 text-slate-500 hover:bg-slate-100 rounded-l-lg text-xs">-</button>
+                                    <span class="px-2 text-xs font-semibold text-slate-800">${item.qty}</span>
+                                    <button onclick="updateCartQuantity('${p.id}', 1)" class="px-2 py-0.5 text-slate-500 hover:bg-slate-100 rounded-r-lg text-xs">+</button>
+                                </div>
+                                <button onclick="removeFromCart('${p.id}')" class="text-slate-400 hover:text-rose-500 text-xs ml-auto">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            const finalTotal = Math.max(0, subtotal - activeDiscount);
+
+            subtotalEl.innerText = `¥${subtotal.toFixed(2)}`;
+            if (activeDiscount > 0) {
+                discountRow.classList.remove('hidden');
+                discountEl.innerText = `-¥${activeDiscount.toFixed(2)}`;
+            } else {
+                discountRow.classList.add('hidden');
+            }
+            totalEl.innerText = `¥${finalTotal.toFixed(2)}`;
+            checkoutBtn.disabled = false;
+        }
+
+        function openCheckoutModal() {
+            toggleCartDrawer();
+            const subtotal = cart.reduce((sum, item) => {
+                const p = products.find(prod => prod.id === item.id);
+                return sum + (p ? p.price * item.qty : 0);
+            }, 0);
+            const finalTotal = Math.max(0, subtotal - activeDiscount);
+            document.getElementById('checkoutTotalAmount').innerText = `¥${finalTotal.toFixed(2)}`;
+            document.getElementById('checkoutModal').classList.remove('hidden');
+        }
+
+        function closeCheckoutModal() {
+            document.getElementById('checkoutModal').classList.add('hidden');
+        }
+
+        function handleCheckout(event) {
+            event.preventDefault();
+
+            // Deduct Stock from Products
+            cart.forEach(item => {
+                const p = products.find(prod => prod.id === item.id);
+                if (p) {
+                    p.stock = Math.max(0, p.stock - item.qty);
+                }
+            });
+
+            saveProductsToStorage();
+            
+            // Clear Cart
+            cart = [];
+            activeDiscount = 0;
+            saveCartToStorage();
+            updateCartUI();
+            renderProducts();
+
+            closeCheckoutModal();
+            alert('🎉 订单支付成功！系统已为您处理发货，模拟库存已扣减。');
+        }
+
+        function openAdminAuth() {
+            document.getElementById('adminAuthModal').classList.remove('hidden');
+            document.getElementById('adminPasswordInput').value = '';
+            document.getElementById('adminAuthError').classList.add('hidden');
+        }
+
+        function closeAdminAuth() {
+            document.getElementById('adminAuthModal').classList.add('hidden');
+        }
+
+        function verifyAdminPassword() {
+            const input = document.getElementById('adminPasswordInput').value;
+            if (input === adminPassword) {
+                closeAdminAuth();
+                openAdminPanel();
+            } else {
+                document.getElementById('adminAuthError').classList.remove('hidden');
+            }
+        }
+
+        function openAdminPanel() {
+            document.getElementById('adminPanelModal').classList.remove('hidden');
+            renderAdminTable();
+        }
+
+        function closeAdminPanel() {
+            document.getElementById('adminPanelModal').classList.add('hidden');
+        }
+
+        function renderAdminTable() {
+            const tbody = document.getElementById('adminProductTableBody');
+            document.getElementById('adminTotalCount').innerText = products.length;
+
+            tbody.innerHTML = products.map(p => `
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="p-3 flex items-center gap-2">
+                        <img src="${p.image}" class="w-8 h-8 rounded object-cover bg-slate-100">
+                        <span class="font-medium text-slate-800">${p.title}</span>
+                    </td>
+                    <td class="p-3"><span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-[11px]">${p.category}</span></td>
+                    <td class="p-3 font-semibold text-slate-800">¥${p.price.toFixed(2)}</td>
+                    <td class="p-3">${p.stock}</td>
+                    <td class="p-3">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold ${p.inStock ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}">
+                            ${p.inStock ? '已上架' : '已下架'}
+                        </span>
+                    </td>
+                    <td class="p-3 text-right space-x-2">
+                        <button onclick="editProduct('${p.id}')" class="text-sky-600 hover:text-sky-800"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="deleteProduct('${p.id}')" class="text-rose-500 hover:text-rose-700"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function resetAdminForm() {
+            document.getElementById('productForm').reset();
+            document.getElementById('editProductId').value = '';
+            document.getElementById('formTitle').innerText = '新增商品';
+        }
+
+        function editProduct(id) {
+            const p = products.find(item => item.id === id);
+            if (!p) return;
+
+            document.getElementById('editProductId').value = p.id;
+            document.getElementById('adminTitle').value = p.title;
+            document.getElementById('adminCategory').value = p.category;
+            document.getElementById('adminPrice').value = p.price;
+            document.getElementById('adminStock').value = p.stock;
+            document.getElementById('adminImage').value = p.image;
+            document.getElementById('adminDescription').value = p.description || '';
+            document.getElementById('adminInStock').checked = p.inStock;
+            document.getElementById('formTitle').innerText = '编辑商品';
+        }
+
+        function handleProductSubmit(event) {
+            event.preventDefault();
+
+            const editId = document.getElementById('editProductId').value;
+            const title = document.getElementById('adminTitle').value.trim();
+            const category = document.getElementById('adminCategory').value.trim();
+            const price = parseFloat(document.getElementById('adminPrice').value);
+            const stock = parseInt(document.getElementById('adminStock').value);
+            const image = document.getElementById('adminImage').value.trim();
+            const description = document.getElementById('adminDescription').value.trim();
+            const inStock = document.getElementById('adminInStock').checked;
+
+            if (editId) {
+                // Update Existing
+                const index = products.findIndex(p => p.id === editId);
+                if (index > -1) {
+                    products[index] = { ...products[index], title, category, price, stock, image, description, inStock };
+                }
+            } else {
+                // Add New
+                const newProduct = {
+                    id: 'p_' + Date.now(),
+                    title,
+                    category,
+                    price,
+                    stock,
+                    image,
+                    description,
+                    inStock,
+                    rating: 5.0
+                };
+                products.unshift(newProduct);
+            }
+
+            saveProductsToStorage();
+            renderCategories();
+            renderProducts();
+            renderAdminTable();
+            resetAdminForm();
+        }
+
+        function deleteProduct(id) {
+            if (confirm('确定要删除此商品吗？')) {
+                products = products.filter(p => p.id !== id);
+                saveProductsToStorage();
+                renderCategories();
+                renderProducts();
+                renderAdminTable();
+            }
+        }
+
+        function restoreDefaultData() {
+            if (confirm('是否重置并恢复初始示例商品数据？当前修改将被覆盖。')) {
+                products = [...DEFAULT_PRODUCTS];
+                saveProductsToStorage();
+                renderCategories();
+                renderProducts();
+                renderAdminTable();
+            }
+        }
+
+        function exportProductsData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(products, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `luxestore_products_${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function importProductsData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedProducts = JSON.parse(e.target.result);
+                    if (Array.isArray(importedProducts)) {
+                        products = importedProducts;
+                        saveProductsToStorage();
+                        renderCategories();
+                        renderProducts();
+                        renderAdminTable();
+                        alert('✅ 成功导入商品 JSON 数据！');
+                    } else {
+                        alert('❌ 导入失败：JSON 数据必须为数组格式');
+                    }
+                } catch (err) {
+                    alert('❌ 文件解析错误，请确保上传了正确的 JSON 文件');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function toggleMobileSearch() {
+            const container = document.getElementById('mobileSearchContainer');
+            container.classList.toggle('hidden');
+        }
+    </script>
+</body>
+</html>
