@@ -58,7 +58,7 @@
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans min-h-screen flex flex-col transition-colors duration-300">
 
-    <!-- 顶部设备视角模拟切换工具栏 (仅用于预览体验与检查) -->
+    <!-- 顶部设备视角模拟切换工具栏 -->
     <div id="deviceSimBar" class="bg-slate-900 text-slate-300 text-xs py-2 px-4 flex justify-between items-center z-50 sticky top-0 border-b border-slate-800">
         <div class="flex items-center gap-2">
             <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -71,13 +71,12 @@
         </div>
     </div>
 
-    <!-- 主包裹容器（用于切换响应式视口） -->
+    <!-- 主包裹容器 -->
     <div id="appContainer" class="preview-wrapper view-desktop min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 relative overflow-hidden">
 
         <!-- 顶部导航栏 -->
         <header class="sticky top-0 z-40 glass border-b border-slate-200/50 dark:border-slate-800/50 transition-all">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-                <!-- Logo -->
                 <a href="#" onclick="switchTab('shop')" class="flex items-center gap-2 font-extrabold text-xl tracking-tight text-brand-600 dark:text-brand-500">
                     <div class="w-9 h-9 rounded-xl bg-brand-600 text-white flex items-center justify-center shadow-lg shadow-brand-500/30">
                         <i class="fa-solid fa-gem text-lg"></i>
@@ -85,27 +84,22 @@
                     <span>LUXE<span class="text-slate-900 dark:text-white">STORE</span></span>
                 </a>
 
-                <!-- 搜索框 -->
                 <div class="hidden sm:flex items-center flex-1 max-w-md mx-8 relative">
                     <input type="text" id="searchInput" oninput="handleSearch()" placeholder="搜索商品名称或关键词..." 
                         class="w-full pl-10 pr-4 py-2 text-sm rounded-full bg-slate-100 dark:bg-slate-900 border-none focus:ring-2 focus:ring-brand-500 transition-all outline-none">
                     <i class="fa-solid fa-magnifying-glass absolute left-3.5 text-slate-400 text-sm"></i>
                 </div>
 
-                <!-- 导航按键区 -->
                 <div class="flex items-center gap-2 sm:gap-4">
-                    <!-- 暗黑模式切换 -->
                     <button onclick="toggleDarkMode()" class="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition">
                         <i id="themeIcon" class="fa-solid fa-moon"></i>
                     </button>
 
-                    <!-- 后台管理按钮 -->
                     <button onclick="openAdminModal()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition">
                         <i class="fa-solid fa-sliders text-brand-500"></i>
                         <span class="hidden sm:inline">商家后台管理</span>
                     </button>
 
-                    <!-- 购物车按钮 -->
                     <button onclick="toggleCartDrawer(true)" class="relative w-10 h-10 rounded-full bg-brand-600 text-white flex items-center justify-center shadow-md shadow-brand-500/20 hover:bg-brand-700 transition">
                         <i class="fa-solid fa-bag-shopping"></i>
                         <span id="cartBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-900 scale-0 transition-transform">0</span>
@@ -117,7 +111,6 @@
         <!-- 主内容区域 -->
         <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
             
-            <!-- 轮播 / 横幅区域 -->
             <div class="relative rounded-3xl overflow-hidden mb-8 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-8 sm:p-12 shadow-2xl flex flex-col justify-center">
                 <div class="absolute inset-0 opacity-20 bg-[radial-gradient(#3b82f6_1px,transparent_1px)] [background-size:16px_16px]"></div>
                 <div class="relative z-10 max-w-xl">
@@ -125,7 +118,7 @@
                         电商美工 & 详情图实时测试引擎
                     </span>
                     <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight mb-4 leading-tight">即时呈现商品切图<br><span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-indigo-300">高保真预览真实画面</span></h1>
-                    <p class="text-slate-300 text-sm sm:text-base mb-6 leading-relaxed">支持上传多图、长切图流，可随时切换手机/平板端视角，实测切图清晰度、字体排版及留白拼接体验。</p>
+                    <p class="text-slate-300 text-sm sm:text-base mb-6 leading-relaxed">支持多图、长切图流，可随时切换手机/平板端视角，实测切图清晰度、字体排版及留白拼接体验。</p>
                     <div class="flex gap-3">
                         <button onclick="scrollToProducts()" class="px-6 py-3 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-semibold text-sm shadow-lg shadow-brand-600/30 transition">浏览商品库</button>
                         <button onclick="openAdminModal()" class="px-6 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-sm backdrop-blur-md transition">上传我的商品与详情图</button>
@@ -135,12 +128,8 @@
 
             <!-- 分类与筛选 -->
             <div id="productSection" class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                <!-- 类别标签 -->
-                <div class="flex items-center gap-2 overflow-x-auto hide-scrollbar py-1" id="categoryContainer">
-                    <!-- 动态生成分类按钮 -->
-                </div>
+                <div class="flex items-center gap-2 overflow-x-auto hide-scrollbar py-1" id="categoryContainer"></div>
 
-                <!-- 排序选框 -->
                 <div class="flex items-center gap-2 self-end sm:self-auto">
                     <span class="text-xs text-slate-500">排序:</span>
                     <select id="sortSelect" onchange="renderProducts()" class="text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-brand-500">
@@ -153,9 +142,7 @@
             </div>
 
             <!-- 商品网格展示区 -->
-            <div id="productGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-                <!-- 动态渲染商品列表 -->
-            </div>
+            <div id="productGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6"></div>
 
             <!-- 空状态显示 -->
             <div id="emptyState" class="hidden py-16 text-center">
@@ -165,7 +152,6 @@
             </div>
         </main>
 
-        <!-- 页脚 -->
         <footer class="border-t border-slate-200 dark:border-slate-800 mt-12 py-8 bg-white dark:bg-slate-900/50">
             <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-400 space-y-2">
                 <p>© 2026 LuxeStore. 运行于 GitHub Pages 静态托管引擎.</p>
@@ -174,10 +160,9 @@
         </footer>
     </div>
 
-    <!-- ==================== 弹窗组件：商品详情模态框 (包含长切图测试区) ==================== -->
+    <!-- 弹窗组件：商品详情模态框 -->
     <div id="detailModal" class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
         <div class="bg-white dark:bg-slate-900 w-full max-w-4xl max-h-[92vh] rounded-3xl shadow-2xl overflow-hidden flex flex-col transform scale-95 transition-transform duration-300" id="detailModalCard">
-            <!-- 模态框顶部导航 -->
             <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/50">
                 <span class="text-xs font-bold uppercase tracking-wider text-brand-600" id="modalCategory">分类名称</span>
                 <button onclick="closeDetailModal()" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-800 dark:hover:text-white flex items-center justify-center transition">
@@ -185,32 +170,24 @@
                 </button>
             </div>
 
-            <!-- 内容滚动区域 -->
             <div class="flex-1 overflow-y-auto p-4 sm:p-8 space-y-8">
-                <!-- 顶部商品基本信息区 -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 items-start">
-                    <!-- 主图/主图相册 -->
                     <div class="space-y-3">
                         <div class="aspect-square rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-800">
                             <img id="modalMainImg" src="" class="w-full h-full object-cover">
                         </div>
-                        <div id="modalThumbnails" class="flex gap-2 overflow-x-auto py-1">
-                            <!-- 动态相册小图 -->
-                        </div>
+                        <div id="modalThumbnails" class="flex gap-2 overflow-x-auto py-1"></div>
                     </div>
 
-                    <!-- 参数与购买卡片 -->
                     <div class="space-y-4">
                         <h2 id="modalTitle" class="text-2xl font-bold text-slate-900 dark:text-white leading-tight">商品标题</h2>
                         <div class="flex items-baseline gap-3">
                             <span class="text-3xl font-extrabold text-brand-600" id="modalPrice">¥0.00</span>
                             <span class="text-sm text-slate-400 line-through" id="modalOriginalPrice">¥0.00</span>
-                            <span class="text-xs px-2 py-0.5 rounded bg-red-100 text-red-600 font-semibold" id="modalDiscountTag">促销</span>
                         </div>
                         <p id="modalDesc" class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">商品描述信息...</p>
 
                         <div class="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-4">
-                            <!-- 数量选择 -->
                             <div class="flex items-center gap-4">
                                 <span class="text-xs font-semibold text-slate-500">选择数量:</span>
                                 <div class="flex items-center border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden">
@@ -221,7 +198,6 @@
                                 <span class="text-xs text-slate-400">库存: <span id="modalStock">99</span> 件</span>
                             </div>
 
-                            <!-- 按钮操作框 -->
                             <div class="flex gap-3 pt-2">
                                 <button onclick="addCurrentToCart()" class="flex-1 py-3 px-4 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm shadow-lg shadow-brand-500/20 transition flex items-center justify-center gap-2">
                                     <i class="fa-solid fa-cart-plus"></i> 加入购物车
@@ -231,7 +207,6 @@
                     </div>
                 </div>
 
-                <!-- 🌟 长图/详情切图渲染区 (重点：真实效果测试) 🌟 -->
                 <div class="pt-8 border-t border-slate-200 dark:border-slate-800">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-lg font-bold flex items-center gap-2">
@@ -240,31 +215,23 @@
                         <span class="text-xs text-slate-400">提示：以下为切图连续拼接效果</span>
                     </div>
 
-                    <!-- 详情切图流：消除图片间隙，直观检测美工切图排版 -->
-                    <div id="detailImageStream" class="w-full bg-slate-100 dark:bg-slate-950 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
-                        <!-- 动态插入长图列表 -->
-                    </div>
+                    <div id="detailImageStream" class="w-full bg-slate-100 dark:bg-slate-950 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 space-y-0"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ==================== 抽屉：购物车 ==================== -->
+    <!-- 抽屉：购物车 -->
     <div id="cartDrawer" class="fixed inset-0 z-50 pointer-events-none opacity-0 transition-opacity duration-300">
         <div class="absolute inset-0 bg-black/50 backdrop-blur-xs" onclick="toggleCartDrawer(false)"></div>
         <div class="absolute right-0 top-0 bottom-0 w-full max-w-md bg-white dark:bg-slate-900 shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 pointer-events-auto" id="cartDrawerPanel">
-            <!-- 头部 -->
             <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
                 <h3 class="font-bold text-lg flex items-center gap-2"><i class="fa-solid fa-bag-shopping text-brand-500"></i> 我的购物车</h3>
                 <button onclick="toggleCartDrawer(false)" class="text-slate-400 hover:text-slate-600 p-2"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
 
-            <!-- 列表 -->
-            <div id="cartItemsList" class="flex-1 overflow-y-auto p-4 space-y-3">
-                <!-- 动态列表 -->
-            </div>
+            <div id="cartItemsList" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
 
-            <!-- 底部结算框 -->
             <div class="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 space-y-3">
                 <div class="space-y-1 text-sm">
                     <div class="flex justify-between text-slate-500"><span>小计:</span><span id="cartSubtotal">¥0.00</span></div>
@@ -275,10 +242,9 @@
         </div>
     </div>
 
-    <!-- ==================== 模态框：商家后台管理系统 ==================== -->
+    <!-- 模态框：商家后台管理系统 -->
     <div id="adminModal" class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
         <div class="bg-white dark:bg-slate-900 w-full max-w-3xl max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden flex flex-col">
-            <!-- 验证视图 -->
             <div id="adminAuthView" class="p-8 text-center space-y-4 my-auto">
                 <div class="w-16 h-16 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center mx-auto text-2xl">
                     <i class="fa-solid fa-lock"></i>
@@ -291,7 +257,6 @@
                 </div>
             </div>
 
-            <!-- 控制台主视图 -->
             <div id="adminMainView" class="hidden flex-1 flex flex-col overflow-hidden">
                 <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
                     <h3 class="font-bold text-lg"><i class="fa-solid fa-sliders text-brand-500 mr-2"></i>商品与详情图管理台</h3>
@@ -299,7 +264,6 @@
                 </div>
 
                 <div class="flex-1 overflow-y-auto p-6 space-y-6">
-                    <!-- 新增/编辑商品表单 -->
                     <div class="bg-slate-50 dark:bg-slate-800/40 p-4 rounded-2xl border border-slate-200/60 dark:border-slate-800 space-y-4">
                         <h4 class="font-bold text-sm text-brand-600 flex items-center gap-1.5" id="formTitle">
                             <i class="fa-solid fa-plus-circle"></i> 添加/更新商品
@@ -313,15 +277,14 @@
                             <input type="number" id="prodOriginalPrice" placeholder="划线原价 (¥)" class="px-3 py-2 text-sm rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 outline-none">
                         </div>
 
-                        <input type="text" id="prodCoverImg" placeholder="主图链接 URL (例如 https://...)" class="w-full px-3 py-2 text-sm rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 outline-none">
+                        <input type="text" id="prodCoverImg" placeholder="主图链接 URL" class="w-full px-3 py-2 text-sm rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 outline-none">
 
-                        <!-- 🌟 重点：详情图批量输入 🌟 -->
                         <div>
-                            <label class="block text-xs font-semibold text-slate-500 mb-1">详情页图片链接 (多个请用逗号或换行分隔，支持长图组):</label>
-                            <textarea id="prodDetailImgs" rows="3" placeholder="https://image1.jpg&#10;https://image2.jpg" class="w-full px-3 py-2 text-xs rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 outline-none font-mono"></textarea>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">详情页图片链接 (多个请用逗号或换行分隔):</label>
+                            <textarea id="prodDetailImgs" rows="3" placeholder="https://...&#10;https://..." class="w-full px-3 py-2 text-xs rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 outline-none font-mono"></textarea>
                         </div>
 
-                        <textarea id="prodDesc" rows="2" placeholder="商品简短描述文本..." class="w-full px-3 py-2 text-sm rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 outline-none"></textarea>
+                        <textarea id="prodDesc" rows="2" placeholder="商品简短描述..." class="w-full px-3 py-2 text-sm rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 outline-none"></textarea>
 
                         <div class="flex gap-2">
                             <button onclick="saveProduct()" class="px-4 py-2 bg-brand-600 text-white rounded-lg text-xs font-semibold hover:bg-brand-700 transition">保存商品</button>
@@ -329,15 +292,12 @@
                         </div>
                     </div>
 
-                    <!-- 现有商品列表 -->
                     <div class="space-y-3">
                         <div class="flex justify-between items-center">
                             <h4 class="font-bold text-sm">已上线商品列表 (<span id="adminProdCount">0</span>)</h4>
                             <button onclick="resetToDefaultData()" class="text-xs text-red-500 hover:underline">恢复预设演示商品</button>
                         </div>
-                        <div id="adminProductTable" class="space-y-2">
-                            <!-- 动态表格 -->
-                        </div>
+                        <div id="adminProductTable" class="space-y-2"></div>
                     </div>
                 </div>
             </div>
@@ -346,49 +306,61 @@
 
     <!-- JS 逻辑控制 -->
     <script>
-        // --- 初始化数据 ---
+        // --- 初始化数据（使用极具稳定性的公开图床与科技产品图） ---
         const DEFAULT_PRODUCTS = [
             {
                 id: '1',
                 title: 'LuxeSound Pro 降噪无线头戴式耳机',
-                category: '智能数码',
+                category: '音频配件',
                 price: 1899,
                 originalPrice: 2299,
                 stock: 45,
                 coverImg: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80',
                 detailImgs: [
                     'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=1000&q=80',
-                    'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=1000&q=80',
-                    'https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=1000&q=80'
+                    'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=1000&q=80'
                 ],
                 desc: '搭载 40mm 镀钛驱动单元，主动智能降噪，长达 50 小时超长续航。'
             },
             {
                 id: '2',
-                title: 'Minimalist 极简设计机械表',
-                category: '精品配饰',
-                price: 3200,
-                originalPrice: 3800,
+                title: 'Ultra Watch Series X 智能手表',
+                category: '智能穿戴',
+                price: 3299,
+                originalPrice: 3899,
                 stock: 12,
                 coverImg: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80',
                 detailImgs: [
                     'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1000&q=80',
                     'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=1000&q=80'
                 ],
-                desc: '蓝宝石玻璃镜面，全自动机械机芯，30 米防水。'
+                desc: '钛金属航空表壳，双频 GPS，全天候健康与运动监测。'
             },
             {
                 id: '3',
-                title: 'UltraVision 4K 智能灵动投影仪',
-                category: '智能数码',
-                price: 4599,
-                originalPrice: 4999,
-                stock: 20,
-                coverImg: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&q=80',
+                title: 'ErgoMech 机械键盘 Wireless',
+                category: '电脑配件',
+                price: 799,
+                originalPrice: 999,
+                stock: 30,
+                coverImg: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=800&q=80',
                 detailImgs: [
-                    'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=1000&q=80'
+                    'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=1000&q=80'
                 ],
-                desc: '云台灵动设计，自适应对焦与梯形校正，影院级色彩呈现。'
+                desc: '热插拔矮轴设计，多模无线连接，炫酷 RGB 背光。'
+            },
+            {
+                id: '4',
+                title: 'Pixellens 4K 极清便携显示器',
+                category: '电脑配件',
+                price: 1599,
+                originalPrice: 1899,
+                stock: 15,
+                coverImg: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=800&q=80',
+                detailImgs: [
+                    'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=1000&q=80'
+                ],
+                desc: '100% DCI-P3 广色域，超薄金属机身，一线直连副屏利器。'
             }
         ];
 
@@ -398,17 +370,14 @@
         let activeDetailProduct = null;
         let detailQtyCount = 1;
 
-        // --- 应用初始化 ---
         window.addEventListener('DOMContentLoaded', () => {
             renderCategories();
             renderProducts();
             updateCartUI();
         });
 
-        // --- 分类与渲染 ---
         function getCategories() {
-            const cats = ['全部', ...new Set(products.map(p => p.category))];
-            return cats;
+            return ['全部', ...new Set(products.map(p => p.category))];
         }
 
         function renderCategories() {
@@ -439,11 +408,10 @@
 
             let filtered = products.filter(p => {
                 const matchCat = selectedCategory === '全部' || p.category === selectedCategory;
-                const matchQuery = p.title.toLowerCase().includes(query) || p.desc.toLowerCase().includes(query);
+                const matchQuery = (p.title || '').toLowerCase().includes(query) || (p.desc || '').toLowerCase().includes(query);
                 return matchCat && matchQuery;
             });
 
-            // 排序
             if (sortVal === 'price-asc') filtered.sort((a, b) => a.price - b.price);
             if (sortVal === 'price-desc') filtered.sort((a, b) => b.price - a.price);
 
@@ -458,12 +426,12 @@
                 <div onclick="openDetailModal('${p.id}')" class="group bg-white dark:bg-slate-900 rounded-2xl p-3 border border-slate-200/60 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col justify-between">
                     <div class="space-y-3">
                         <div class="aspect-square rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 relative">
-                            <img src="${p.coverImg}" alt="${p.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                            <span class="absolute top-2 left-2 bg-black/40 backdrop-blur-md text-white text-[10px] px-2 py-0.5 rounded-full">${p.category}</span>
+                            <img src="${p.coverImg}" alt="${p.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80'">
+                            <span class="absolute top-2 left-2 bg-black/40 backdrop-blur-md text-white text-[10px] px-2 py-0.5 rounded-full">${p.category || '通用'}</span>
                         </div>
                         <div>
                             <h3 class="font-bold text-sm text-slate-900 dark:text-white line-clamp-1 group-hover:text-brand-600 transition">${p.title}</h3>
-                            <p class="text-xs text-slate-400 line-clamp-1 mt-1">${p.desc}</p>
+                            <p class="text-xs text-slate-400 line-clamp-1 mt-1">${p.desc || ''}</p>
                         </div>
                     </div>
                     <div class="flex items-center justify-between pt-3 mt-2 border-t border-slate-100 dark:border-slate-800/50">
@@ -480,7 +448,6 @@
             `).join('');
         }
 
-        // --- 搜索与视角切换 ---
         function handleSearch() {
             renderProducts();
         }
@@ -498,35 +465,32 @@
             if(type==='mobile') document.getElementById('btnMob').className = "px-3 py-1 rounded-md text-xs font-semibold bg-brand-600 text-white transition";
         }
 
-        // --- 详细弹窗 & 长图测试核心逻辑 ---
         function openDetailModal(id) {
             activeDetailProduct = products.find(p => p.id === id);
             if (!activeDetailProduct) return;
 
             detailQtyCount = 1;
             document.getElementById('detailQty').innerText = '1';
-            document.getElementById('modalCategory').innerText = activeDetailProduct.category;
+            document.getElementById('modalCategory').innerText = activeDetailProduct.category || '通用';
             document.getElementById('modalTitle').innerText = activeDetailProduct.title;
             document.getElementById('modalPrice').innerText = `¥${activeDetailProduct.price}`;
             document.getElementById('modalOriginalPrice').innerText = activeDetailProduct.originalPrice ? `¥${activeDetailProduct.originalPrice}` : '';
-            document.getElementById('modalDesc').innerText = activeDetailProduct.desc;
+            document.getElementById('modalDesc').innerText = activeDetailProduct.desc || '';
             document.getElementById('modalStock').innerText = activeDetailProduct.stock || 99;
             document.getElementById('modalMainImg').src = activeDetailProduct.coverImg;
 
-            // 渲染相册小图
             const thumbs = [activeDetailProduct.coverImg, ...(activeDetailProduct.detailImgs || [])];
-            document.getElementById('modalThumbnails').innerHTML = thumbs.map((img, i) => `
-                <img src="${img}" onclick="document.getElementById('modalMainImg').src='${img}'" class="w-12 h-12 rounded-lg object-cover border-2 border-transparent hover:border-brand-500 cursor-pointer">
+            document.getElementById('modalThumbnails').innerHTML = thumbs.map((img) => `
+                <img src="${img}" onclick="document.getElementById('modalMainImg').src='${img}'" class="w-12 h-12 rounded-lg object-cover border-2 border-transparent hover:border-brand-500 cursor-pointer" onerror="this.style.display='none'">
             `).join('');
 
-            // 🌟 核心：渲染长图切图流 (消除缝隙，全屏展示) 🌟
             const detailImgStream = document.getElementById('detailImageStream');
             const images = activeDetailProduct.detailImgs && activeDetailProduct.detailImgs.length > 0 
                 ? activeDetailProduct.detailImgs 
                 : [activeDetailProduct.coverImg];
 
             detailImgStream.innerHTML = images.map(img => `
-                <img src="${img}" class="w-full h-auto block border-0 leading-none" loading="lazy" alt="详情切图">
+                <img src="${img}" class="w-full h-auto block border-0 leading-none" loading="lazy" alt="详情切图" onerror="this.style.display='none'">
             `).join('');
 
             const modal = document.getElementById('detailModal');
@@ -554,7 +518,6 @@
             }
         }
 
-        // --- 购物车逻辑 ---
         function addToCart(id, qty = 1) {
             const prod = products.find(p => p.id === id);
             if (!prod) return;
@@ -581,7 +544,6 @@
             badge.innerText = totalQty;
             badge.className = `absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-900 transition-transform ${totalQty > 0 ? 'scale-100' : 'scale-0'}`;
 
-            // 渲染购物车列表
             const list = document.getElementById('cartItemsList');
             if (cart.length === 0) {
                 list.innerHTML = '<div class="text-center py-8 text-xs text-slate-400">购物车是空的</div>';
@@ -637,7 +599,6 @@
             toggleCartDrawer(false);
         }
 
-        // --- 商家后台管理系统逻辑 ---
         function openAdminModal() {
             document.getElementById('adminModal').classList.remove('opacity-0', 'pointer-events-none');
         }
@@ -689,7 +650,6 @@
 
             if (!title) return alert('请输入商品名称');
 
-            // 解析多行/逗号分隔的图片 URL
             const detailImgs = detailImgsRaw
                 .split(/[\n,]/)
                 .map(s => s.trim())
@@ -722,7 +682,7 @@
             document.getElementById('prodOriginalPrice').value = p.originalPrice || '';
             document.getElementById('prodCoverImg').value = p.coverImg;
             document.getElementById('prodDetailImgs').value = (p.detailImgs || []).join('\n');
-            document.getElementById('prodDesc').value = p.desc;
+            document.getElementById('prodDesc').value = p.desc || '';
             document.getElementById('formTitle').innerText = '编辑商品数据';
         }
 
