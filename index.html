@@ -46,7 +46,6 @@
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
-        /* 模拟器设备画框样式 */
         .preview-wrapper {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             margin: 0 auto;
@@ -244,7 +243,14 @@
 
     <!-- 模态框：商家后台管理系统 -->
     <div id="adminModal" class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300" onclick="if(event.target === this) closeAdminModal()">
-        <div class="bg-white dark:bg-slate-900 w-full max-w-3xl max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden flex flex-col">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-3xl max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden flex flex-col relative">
+            
+            <!-- 修复：为密码验证视图增加显眼的右上角关闭按钮 -->
+            <button onclick="closeAdminModal()" class="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-800 dark:hover:text-white flex items-center justify-center transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <!-- 验证视图 -->
             <div id="adminAuthView" class="p-8 text-center space-y-4 my-auto">
                 <div class="w-16 h-16 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center mx-auto text-2xl">
                     <i class="fa-solid fa-lock"></i>
@@ -257,6 +263,7 @@
                 </div>
             </div>
 
+            <!-- 控制台主视图 -->
             <div id="adminMainView" class="hidden flex-1 flex flex-col overflow-hidden">
                 <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
                     <h3 class="font-bold text-lg"><i class="fa-solid fa-sliders text-brand-500 mr-2"></i>商品与详情图管理台</h3>
@@ -306,7 +313,7 @@
 
     <!-- JS 逻辑控制 -->
     <script>
-        // --- 初始化数据（各分类图片已精准隔离修复） ---
+        // --- 预设准确对应的高清测试商品 ---
         const DEFAULT_PRODUCTS = [
             {
                 id: '1',
@@ -378,7 +385,10 @@
             }
         ];
 
-        let products = JSON.parse(localStorage.getItem('luxestore_products')) || DEFAULT_PRODUCTS;
+        // 🌟 修复：强制用最新对应的数据覆盖旧缓存，彻底解决图片错乱问题
+        let products = DEFAULT_PRODUCTS;
+        localStorage.setItem('luxestore_products', JSON.stringify(DEFAULT_PRODUCTS));
+
         let cart = JSON.parse(localStorage.getItem('luxestore_cart')) || [];
         let selectedCategory = '全部';
         let activeDetailProduct = null;
@@ -623,6 +633,10 @@
         }
 
         function openAdminModal() {
+            // 每次打开时重置为密码验证视图
+            document.getElementById('adminAuthView').classList.remove('hidden');
+            document.getElementById('adminMainView').classList.add('hidden');
+            document.getElementById('adminPasswordInput').value = '';
             document.getElementById('adminModal').classList.remove('opacity-0', 'pointer-events-none');
         }
 
@@ -732,7 +746,7 @@
 
         function resetToDefaultData() {
             if (!confirm('这会重置所有自定义数据，确认恢复吗？')) return;
-            localStorage.removeItem('luxestore_products');
+            localStorage.setItem('luxestore_products', JSON.stringify(DEFAULT_PRODUCTS));
             products = DEFAULT_PRODUCTS;
             renderAdminTable();
             renderCategories();
