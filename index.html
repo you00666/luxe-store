@@ -6,10 +6,6 @@
     <title>LuxeStore - 极简高奢电商 & 详情图预览测试平台</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -32,15 +28,21 @@
             }
         }
     </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        /* 保底内联基础样式，防止 CDN 偶尔挂掉导致完全无样式 */
+        body { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
         .glass {
-            background: rgba(255, 255, 255, 0.75);
+            background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.4);
         }
         .dark .glass {
-            background: rgba(15, 23, 42, 0.75);
+            background: rgba(15, 23, 42, 0.85);
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
@@ -384,7 +386,6 @@
             }
         ];
 
-        // 🌟 核心修改：仅在本地没有缓存数据时才写入默认数据，防止刷新丢失自定义商品！
         let products = JSON.parse(localStorage.getItem('luxestore_products'));
         if (!products || !Array.isArray(products) || products.length === 0) {
             products = DEFAULT_PRODUCTS;
@@ -401,7 +402,6 @@
             renderProducts();
             updateCartUI();
 
-            // 全局监听 ESC 键关闭所有弹窗
             window.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
                     closeDetailModal();
@@ -647,120 +647,4 @@
 
         function verifyAdminPass() {
             const input = document.getElementById('adminPasswordInput').value;
-            if (input === 'admin123') {
-                document.getElementById('adminAuthView').classList.add('hidden');
-                document.getElementById('adminMainView').classList.remove('hidden');
-                renderAdminTable();
-            } else {
-                alert('密码错误！(默认密码: admin123)');
-            }
-        }
-
-        function renderAdminTable() {
-            document.getElementById('adminProdCount').innerText = products.length;
-            const container = document.getElementById('adminProductTable');
-            container.innerHTML = products.map(p => `
-                <div class="flex items-center justify-between p-2.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200/60 dark:border-slate-800 text-xs">
-                    <div class="flex items-center gap-3">
-                        <img src="${p.coverImg}" class="w-10 h-10 rounded-lg object-cover" onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&q=80'">
-                        <div>
-                            <div class="font-bold text-slate-800 dark:text-slate-200">${p.title}</div>
-                            <div class="text-slate-400">¥${p.price} | 分类: ${p.category} | 详情图: ${(p.detailImgs||[]).length} 张</div>
-                        </div>
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="editProduct('${p.id}')" class="px-2 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-brand-600 hover:text-white rounded transition">编辑</button>
-                        <button onclick="deleteProduct('${p.id}')" class="px-2 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200 transition">删除</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function saveProduct() {
-            const id = document.getElementById('editProductId').value || Date.now().toString();
-            const title = document.getElementById('prodTitle').value.trim();
-            const category = document.getElementById('prodCategory').value.trim() || '通用';
-            const price = parseFloat(document.getElementById('prodPrice').value) || 0;
-            const originalPrice = parseFloat(document.getElementById('prodOriginalPrice').value) || null;
-            const coverImg = document.getElementById('prodCoverImg').value.trim() || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80';
-            const detailImgsRaw = document.getElementById('prodDetailImgs').value;
-            const desc = document.getElementById('prodDesc').value.trim();
-
-            if (!title) return alert('请输入商品名称');
-
-            const detailImgs = detailImgsRaw
-                .split(/[\n,]/)
-                .map(s => s.trim())
-                .filter(s => s.length > 0);
-
-            const existingIndex = products.findIndex(p => p.id === id);
-            const newProd = { id, title, category, price, originalPrice, coverImg, detailImgs, desc, stock: 99 };
-
-            if (existingIndex >= 0) {
-                products[existingIndex] = newProd;
-            } else {
-                products.unshift(newProd);
-            }
-
-            localStorage.setItem('luxestore_products', JSON.stringify(products));
-            resetAdminForm();
-            renderAdminTable();
-            renderCategories();
-            renderProducts();
-            alert('商品保存成功！已持久保存至浏览器缓存，刷新也不会丢失。');
-        }
-
-        function editProduct(id) {
-            const p = products.find(prod => prod.id === id);
-            if (!p) return;
-            document.getElementById('editProductId').value = p.id;
-            document.getElementById('prodTitle').value = p.title;
-            document.getElementById('prodCategory').value = p.category;
-            document.getElementById('prodPrice').value = p.price;
-            document.getElementById('prodOriginalPrice').value = p.originalPrice || '';
-            document.getElementById('prodCoverImg').value = p.coverImg;
-            document.getElementById('prodDetailImgs').value = (p.detailImgs || []).join('\n');
-            document.getElementById('prodDesc').value = p.desc || '';
-            document.getElementById('formTitle').innerText = '编辑商品数据';
-        }
-
-        function deleteProduct(id) {
-            if (!confirm('确定要删除该商品吗？')) return;
-            products = products.filter(p => p.id !== id);
-            localStorage.setItem('luxestore_products', JSON.stringify(products));
-            renderAdminTable();
-            renderCategories();
-            renderProducts();
-        }
-
-        function resetAdminForm() {
-            document.getElementById('editProductId').value = '';
-            document.getElementById('prodTitle').value = '';
-            document.getElementById('prodCategory').value = '';
-            document.getElementById('prodPrice').value = '';
-            document.getElementById('prodOriginalPrice').value = '';
-            document.getElementById('prodCoverImg').value = '';
-            document.getElementById('prodDetailImgs').value = '';
-            document.getElementById('prodDesc').value = '';
-            document.getElementById('formTitle').innerText = '添加/更新商品';
-        }
-
-        function resetToDefaultData() {
-            if (!confirm('这会重置所有自定义数据，确认恢复吗？')) return;
-            localStorage.setItem('luxestore_products', JSON.stringify(DEFAULT_PRODUCTS));
-            products = DEFAULT_PRODUCTS;
-            renderAdminTable();
-            renderCategories();
-            renderProducts();
-        }
-
-        function scrollToProducts() {
-            document.getElementById('productSection').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function toggleDarkMode() {
-            document.documentElement.classList.toggle('dark');
-        }
-    </script>
-</body>
-</html>
+            if (input === 'admin123')
