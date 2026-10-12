@@ -245,7 +245,6 @@
     <div id="adminModal" class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300" onclick="if(event.target === this) closeAdminModal()">
         <div class="bg-white dark:bg-slate-900 w-full max-w-3xl max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden flex flex-col relative">
             
-            <!-- 修复：为密码验证视图增加显眼的右上角关闭按钮 -->
             <button onclick="closeAdminModal()" class="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-800 dark:hover:text-white flex items-center justify-center transition">
                 <i class="fa-solid fa-xmark"></i>
             </button>
@@ -279,15 +278,15 @@
                         
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <input type="text" id="prodTitle" placeholder="商品名称" class="px-3 py-2 text-sm rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 outline-none">
-                            <input type="text" id="prodCategory" placeholder="商品分类(如: 智能数码)" class="px-3 py-2 text-sm rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 outline-none">
+                            <input type="text" id="prodCategory" placeholder="商品分类(如: 家具家居)" class="px-3 py-2 text-sm rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 outline-none">
                             <input type="number" id="prodPrice" placeholder="销售价格 (¥)" class="px-3 py-2 text-sm rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 outline-none">
                             <input type="number" id="prodOriginalPrice" placeholder="划线原价 (¥)" class="px-3 py-2 text-sm rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 outline-none">
                         </div>
 
-                        <input type="text" id="prodCoverImg" placeholder="主图链接 URL" class="w-full px-3 py-2 text-sm rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 outline-none">
+                        <input type="text" id="prodCoverImg" placeholder="主图链接 URL (支持外部图床链接)" class="w-full px-3 py-2 text-sm rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 outline-none">
 
                         <div>
-                            <label class="block text-xs font-semibold text-slate-500 mb-1">详情页图片链接 (多个请用逗号或换行分隔):</label>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">详情页图片链接 (多个请用逗号或换行分隔，多张长图会自动上下连缀):</label>
                             <textarea id="prodDetailImgs" rows="3" placeholder="https://...&#10;https://..." class="w-full px-3 py-2 text-xs rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 outline-none font-mono"></textarea>
                         </div>
 
@@ -313,7 +312,6 @@
 
     <!-- JS 逻辑控制 -->
     <script>
-        // --- 预设准确对应的高清测试商品 ---
         const DEFAULT_PRODUCTS = [
             {
                 id: '1',
@@ -358,16 +356,17 @@
             },
             {
                 id: '4',
-                title: 'Pixellens 4K 极清便携显示器',
-                category: '电脑配件',
+                title: 'Nordic 现代简约实木休闲沙发椅',
+                category: '家具家居',
                 price: 1599,
-                originalPrice: 1899,
-                stock: 15,
-                coverImg: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=800&q=80',
+                originalPrice: 1999,
+                stock: 10,
+                coverImg: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&q=80',
                 detailImgs: [
-                    'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=1000&q=80'
+                    'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1000&q=80',
+                    'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1000&q=80'
                 ],
-                desc: '100% DCI-P3 广色域，超薄金属机身，一线直连副屏利器。'
+                desc: '北欧风情，高弹海绵坐垫，优质北美白蜡木框架，兼具美观与舒适。'
             },
             {
                 id: '5',
@@ -385,9 +384,12 @@
             }
         ];
 
-        // 🌟 修复：强制用最新对应的数据覆盖旧缓存，彻底解决图片错乱问题
-        let products = DEFAULT_PRODUCTS;
-        localStorage.setItem('luxestore_products', JSON.stringify(DEFAULT_PRODUCTS));
+        // 🌟 核心修改：仅在本地没有缓存数据时才写入默认数据，防止刷新丢失自定义商品！
+        let products = JSON.parse(localStorage.getItem('luxestore_products'));
+        if (!products || !Array.isArray(products) || products.length === 0) {
+            products = DEFAULT_PRODUCTS;
+            localStorage.setItem('luxestore_products', JSON.stringify(DEFAULT_PRODUCTS));
+        }
 
         let cart = JSON.parse(localStorage.getItem('luxestore_cart')) || [];
         let selectedCategory = '全部';
@@ -633,7 +635,6 @@
         }
 
         function openAdminModal() {
-            // 每次打开时重置为密码验证视图
             document.getElementById('adminAuthView').classList.remove('hidden');
             document.getElementById('adminMainView').classList.add('hidden');
             document.getElementById('adminPasswordInput').value = '';
@@ -661,7 +662,7 @@
             container.innerHTML = products.map(p => `
                 <div class="flex items-center justify-between p-2.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200/60 dark:border-slate-800 text-xs">
                     <div class="flex items-center gap-3">
-                        <img src="${p.coverImg}" class="w-10 h-10 rounded-lg object-cover">
+                        <img src="${p.coverImg}" class="w-10 h-10 rounded-lg object-cover" onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&q=80'">
                         <div>
                             <div class="font-bold text-slate-800 dark:text-slate-200">${p.title}</div>
                             <div class="text-slate-400">¥${p.price} | 分类: ${p.category} | 详情图: ${(p.detailImgs||[]).length} 张</div>
@@ -706,7 +707,7 @@
             renderAdminTable();
             renderCategories();
             renderProducts();
-            alert('商品保存成功！可在线测试详情图预览。');
+            alert('商品保存成功！已持久保存至浏览器缓存，刷新也不会丢失。');
         }
 
         function editProduct(id) {
