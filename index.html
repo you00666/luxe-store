@@ -91,6 +91,7 @@
                     <span class="inline-block px-3 py-1 rounded-full bg-brand-500/20 text-brand-300 text-xs font-semibold uppercase tracking-wider mb-3 backdrop-blur-md border border-brand-500/30">
                         电商美工 & 详情图实时测试引擎
                     </span>
+                    <!-- 修复：将第二行改为高亮醒目的 solid 冰蓝色，彻底解决看不清的问题 -->
                     <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight mb-4 leading-tight text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
                         即时呈现商品切图<br>
                         <span class="text-cyan-300 drop-shadow-[0_2px_8px_rgba(0,255,255,0.3)]">高保真预览真实画面</span>
@@ -131,7 +132,7 @@
         <footer class="border-t border-slate-200 dark:border-slate-800 mt-12 py-8 bg-white dark:bg-slate-900/50">
             <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-400 space-y-2">
                 <p>© 2026 LuxeStore. 运行于 GitHub Pages 静态托管引擎.</p>
-                <p>支持后台自定义、本地图片 Base64 转换以及完整电商购物流程模拟。</p>
+                <p>支持后台自定义、图片 URL 批量导入以及完整电商购物流程模拟。</p>
             </div>
         </footer>
     </div>
@@ -231,4 +232,534 @@
                     <i class="fa-solid fa-lock"></i>
                 </div>
                 <h3 class="text-xl font-bold">后台管理权限验证</h3>
-                <p class="text-xs text-slate-400
+                <p class="text-xs text-slate-400">请输入控制台管理密码（默认密码：<code class="bg-slate-100 px-1.5 py-0.5 rounded text-brand-500">admin123</code>）</p>
+                <div class="max-w-xs mx-auto space-y-3">
+                    <input type="password" id="adminPasswordInput" placeholder="请输入密码" class="w-full px-4 py-2 rounded-xl bg-slate-100 border-none text-center outline-none focus:ring-2 focus:ring-brand-500" onkeydown="if(event.key==='Enter') verifyAdminPass()">
+                    <button onclick="verifyAdminPass()" class="w-full py-2.5 bg-brand-600 text-white font-semibold rounded-xl hover:bg-brand-700 transition">解锁管理面板</button>
+                </div>
+            </div>
+
+            <!-- 控制台主视图 -->
+            <div id="adminMainView" class="hidden flex-1 flex flex-col overflow-hidden">
+                <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                    <h3 class="font-bold text-lg"><i class="fa-solid fa-sliders text-brand-500 mr-2"></i>商品与详情图管理台</h3>
+                    <button onclick="closeAdminModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
+
+                <div class="flex-1 overflow-y-auto p-6 space-y-6">
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-4">
+                        <h4 class="font-bold text-sm text-brand-600 flex items-center gap-1.5" id="formTitle">
+                            <i class="fa-solid fa-plus-circle"></i> 添加/更新商品
+                        </h4>
+                        <input type="hidden" id="editProductId">
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <input type="text" id="prodTitle" placeholder="商品名称" class="px-3 py-2 text-sm rounded-lg bg-white border border-slate-200 outline-none">
+                            <input type="text" id="prodCategory" placeholder="商品分类(如: 家具家居)" class="px-3 py-2 text-sm rounded-lg bg-white border border-slate-200 outline-none">
+                            <input type="number" id="prodPrice" placeholder="销售价格 (¥)" class="px-3 py-2 text-sm rounded-lg bg-white border border-slate-200 outline-none">
+                            <input type="number" id="prodOriginalPrice" placeholder="划线原价 (¥)" class="px-3 py-2 text-sm rounded-lg bg-white border border-slate-200 outline-none">
+                        </div>
+
+                        <!-- 主图设置 -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">商品主图 (可输入 URL 或直接上传本地图片):</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="prodCoverImg" placeholder="主图链接 URL" class="flex-1 px-3 py-2 text-sm rounded-lg bg-white border border-slate-200 outline-none">
+                                <label class="px-3 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-semibold rounded-lg cursor-pointer flex items-center gap-1 shrink-0 transition">
+                                    <i class="fa-solid fa-upload"></i> 选择本地图片
+                                    <input type="file" accept="image/*" class="hidden" onchange="handleLocalCoverUpload(event)">
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- 详情图设置 -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">详情页图片切图 (多个 URL 请用逗号/换行分隔，或直接上传本地图片):</label>
+                            <textarea id="prodDetailImgs" rows="3" placeholder="https://... 或点击下方按钮上传本地切图" class="w-full px-3 py-2 text-xs rounded-lg bg-white border border-slate-200 outline-none font-mono mb-2"></textarea>
+                            <label class="inline-flex items-center gap-1 px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-semibold rounded-lg cursor-pointer transition">
+                                <i class="fa-solid fa-images"></i> 批量选择本地切图文件上传
+                                <input type="file" accept="image/*" multiple class="hidden" onchange="handleLocalDetailUpload(event)">
+                            </label>
+                        </div>
+
+                        <textarea id="prodDesc" rows="2" placeholder="商品简短描述..." class="w-full px-3 py-2 text-sm rounded-lg bg-white border border-slate-200 outline-none"></textarea>
+
+                        <div class="flex gap-2">
+                            <button onclick="saveProduct()" class="px-4 py-2 bg-brand-600 text-white rounded-lg text-xs font-semibold hover:bg-brand-700 transition">保存商品</button>
+                            <button onclick="resetAdminForm()" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold hover:bg-slate-300 transition">清空表单</button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <h4 class="font-bold text-sm">已上线商品列表 (<span id="adminProdCount">0</span>)</h4>
+                            <button onclick="resetToDefaultData()" class="text-xs text-red-500 hover:underline">恢复预设演示商品</button>
+                        </div>
+                        <div id="adminProductTable" class="space-y-2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS 逻辑控制 -->
+    <script>
+        const DEFAULT_PRODUCTS = [
+            {
+                id: '1',
+                title: 'LuxeSound Pro 降噪无线头戴式耳机',
+                category: '音频配件',
+                price: 1899,
+                originalPrice: 2299,
+                stock: 45,
+                coverImg: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80',
+                detailImgs: [
+                    'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=1000&q=80',
+                    'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=1000&q=80'
+                ],
+                desc: '搭载 40mm 镀钛驱动单元，主动智能降噪，长达 50 小时超长续航。'
+            },
+            {
+                id: '2',
+                title: 'Ultra Watch Series X 智能手表',
+                category: '智能穿戴',
+                price: 3299,
+                originalPrice: 3899,
+                stock: 12,
+                coverImg: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80',
+                detailImgs: [
+                    'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1000&q=80',
+                    'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=1000&q=80'
+                ],
+                desc: '钛金属航空表壳，双频 GPS，全天候健康与运动监测。'
+            },
+            {
+                id: '3',
+                title: 'ErgoMech 机械键盘 Wireless',
+                category: '电脑配件',
+                price: 799,
+                originalPrice: 999,
+                stock: 30,
+                coverImg: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=800&q=80',
+                detailImgs: [
+                    'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=1000&q=80'
+                ],
+                desc: '热插拔矮轴设计，多模无线连接，炫酷 RGB 背光。'
+            },
+            {
+                id: '4',
+                title: 'Nordic 现代简约实木休闲沙发椅',
+                category: '家具家居',
+                price: 1599,
+                originalPrice: 1999,
+                stock: 10,
+                coverImg: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&q=80',
+                detailImgs: [
+                    'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1000&q=80',
+                    'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1000&q=80'
+                ],
+                desc: '北欧风情，高弹海绵坐垫，优质北美白蜡木框架，兼具美观与舒适。'
+            }
+        ];
+
+        let products = [];
+        try {
+            const saved = localStorage.getItem('luxestore_products');
+            products = saved ? JSON.parse(saved) : DEFAULT_PRODUCTS;
+            if (!Array.isArray(products) || products.length === 0) {
+                products = DEFAULT_PRODUCTS;
+            }
+        } catch (e) {
+            products = DEFAULT_PRODUCTS;
+        }
+        localStorage.setItem('luxestore_products', JSON.stringify(products));
+
+        let cart = JSON.parse(localStorage.getItem('luxestore_cart')) || [];
+        let selectedCategory = '全部';
+        let activeDetailProduct = null;
+        let detailQtyCount = 1;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderCategories();
+            renderProducts();
+            updateCartUI();
+
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeDetailModal();
+                    closeAdminModal();
+                    toggleCartDrawer(false);
+                }
+            });
+        });
+
+        // 处理本地主图上传转 Base64
+        function handleLocalCoverUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('prodCoverImg').value = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // 处理本地详情切图批量上传转 Base64
+        function handleLocalDetailUpload(event) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+            const textarea = document.getElementById('prodDetailImgs');
+            
+            let loadedCount = 0;
+            const results = [];
+            
+            for (let i = 0; i < files.length; i++) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    results.push(e.target.result);
+                    loadedCount++;
+                    if (loadedCount === files.length) {
+                        const existing = textarea.value.trim();
+                        const appended = results.join('\n');
+                        textarea.value = existing ? existing + '\n' + appended : appended;
+                    }
+                };
+                reader.readAsDataURL(files[i]);
+            }
+        }
+
+        function getCategories() {
+            return ['全部', ...new Set(products.map(p => p.category))];
+        }
+
+        function renderCategories() {
+            const container = document.getElementById('categoryContainer');
+            const categories = getCategories();
+            container.innerHTML = categories.map(cat => `
+                <button onclick="selectCategory('${cat}')" class="px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
+                    selectedCategory === cat 
+                        ? 'bg-brand-600 text-white shadow-md shadow-brand-500/20' 
+                        : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
+                }">
+                    ${cat}
+                </button>
+            `).join('');
+        }
+
+        function selectCategory(cat) {
+            selectedCategory = cat;
+            renderCategories();
+            renderProducts();
+        }
+
+        function renderProducts() {
+            const grid = document.getElementById('productGrid');
+            const empty = document.getElementById('emptyState');
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const sortVal = document.getElementById('sortSelect').value;
+
+            let filtered = products.filter(p => {
+                const matchCat = selectedCategory === '全部' || p.category === selectedCategory;
+                const matchQuery = (p.title || '').toLowerCase().includes(query) || (p.desc || '').toLowerCase().includes(query);
+                return matchCat && matchQuery;
+            });
+
+            if (sortVal === 'price-asc') filtered.sort((a, b) => a.price - b.price);
+            if (sortVal === 'price-desc') filtered.sort((a, b) => b.price - a.price);
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
+                empty.classList.remove('hidden');
+                return;
+            }
+            empty.classList.add('hidden');
+
+            grid.innerHTML = filtered.map(p => `
+                <div onclick="openDetailModal('${p.id}')" class="group bg-white rounded-2xl p-3 border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col justify-between">
+                    <div class="space-y-3">
+                        <div class="aspect-square rounded-xl overflow-hidden bg-slate-100 relative">
+                            <img src="${p.coverImg}" alt="${p.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80'">
+                            <span class="absolute top-2 left-2 bg-black/40 backdrop-blur-md text-white text-[10px] px-2 py-0.5 rounded-full">${p.category || '通用'}</span>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-sm text-slate-900 line-clamp-1 group-hover:text-brand-600 transition">${p.title}</h3>
+                            <p class="text-xs text-slate-400 line-clamp-1 mt-1">${p.desc || ''}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between pt-3 mt-2 border-t border-slate-100">
+                        <div>
+                            <span class="text-xs font-bold text-brand-600">¥</span>
+                            <span class="text-base font-extrabold text-slate-900">${p.price}</span>
+                            ${p.originalPrice ? `<span class="text-[10px] text-slate-400 line-through ml-1">¥${p.originalPrice}</span>` : ''}
+                        </div>
+                        <button onclick="event.stopPropagation(); addToCart('${p.id}')" class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 hover:bg-brand-600 hover:text-white flex items-center justify-center transition">
+                            <i class="fa-solid fa-plus text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function handleSearch() { renderProducts(); }
+
+        function setViewport(type) {
+            const wrapper = document.getElementById('appContainer');
+            wrapper.className = `preview-wrapper view-${type} min-h-screen flex flex-col bg-slate-50 relative`;
+            ['Desk', 'Tab', 'Mob'].forEach(id => {
+                const btn = document.getElementById(`btn${id}`);
+                btn.className = "px-3 py-1 rounded-md text-xs font-semibold hover:text-white transition";
+            });
+            if(type==='desktop') document.getElementById('btnDesk').className = "px-3 py-1 rounded-md text-xs font-semibold bg-brand-600 text-white transition";
+            if(type==='tablet') document.getElementById('btnTab').className = "px-3 py-1 rounded-md text-xs font-semibold bg-brand-600 text-white transition";
+            if(type==='mobile') document.getElementById('btnMob').className = "px-3 py-1 rounded-md text-xs font-semibold bg-brand-600 text-white transition";
+        }
+
+        function openDetailModal(id) {
+            activeDetailProduct = products.find(p => p.id === id);
+            if (!activeDetailProduct) return;
+
+            detailQtyCount = 1;
+            document.getElementById('detailQty').innerText = '1';
+            document.getElementById('modalCategory').innerText = activeDetailProduct.category || '通用';
+            document.getElementById('modalTitle').innerText = activeDetailProduct.title;
+            document.getElementById('modalPrice').innerText = `¥${activeDetailProduct.price}`;
+            document.getElementById('modalOriginalPrice').innerText = activeDetailProduct.originalPrice ? `¥${activeDetailProduct.originalPrice}` : '';
+            document.getElementById('modalDesc').innerText = activeDetailProduct.desc || '';
+            document.getElementById('modalStock').innerText = activeDetailProduct.stock || 99;
+            document.getElementById('modalMainImg').src = activeDetailProduct.coverImg;
+
+            const thumbs = [activeDetailProduct.coverImg, ...(activeDetailProduct.detailImgs || [])];
+            document.getElementById('modalThumbnails').innerHTML = thumbs.map((img) => `
+                <img src="${img}" onclick="document.getElementById('modalMainImg').src='${img}'" class="w-12 h-12 rounded-lg object-cover border-2 border-transparent hover:border-brand-500 cursor-pointer" onerror="this.style.display='none'">
+            `).join('');
+
+            const detailImgStream = document.getElementById('detailImageStream');
+            const images = activeDetailProduct.detailImgs && activeDetailProduct.detailImgs.length > 0 
+                ? activeDetailProduct.detailImgs 
+                : [activeDetailProduct.coverImg];
+
+            detailImgStream.innerHTML = images.map(img => `
+                <img src="${img}" class="w-full h-auto block border-0 leading-none" loading="lazy" alt="详情切图" onerror="this.style.display='none'">
+            `).join('');
+
+            const modal = document.getElementById('detailModal');
+            const card = document.getElementById('detailModalCard');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            card.classList.remove('scale-95');
+        }
+
+        function closeDetailModal() {
+            const modal = document.getElementById('detailModal');
+            const card = document.getElementById('detailModalCard');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            card.classList.add('scale-95');
+        }
+
+        function adjustDetailQty(delta) {
+            detailQtyCount = Math.max(1, detailQtyCount + delta);
+            document.getElementById('detailQty').innerText = detailQtyCount;
+        }
+
+        function addCurrentToCart() {
+            if (activeDetailProduct) {
+                addToCart(activeDetailProduct.id, detailQtyCount);
+                closeDetailModal();
+            }
+        }
+
+        function addToCart(id, qty = 1) {
+            const prod = products.find(p => p.id === id);
+            if (!prod) return;
+            const existing = cart.find(item => item.id === id);
+            if (existing) { existing.qty += qty; } 
+            else { cart.push({ id: prod.id, title: prod.title, price: prod.price, coverImg: prod.coverImg, qty: qty }); }
+            saveCart();
+            toggleCartDrawer(true);
+        }
+
+        function saveCart() {
+            localStorage.setItem('luxestore_cart', JSON.stringify(cart));
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const badge = document.getElementById('cartBadge');
+            const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+            badge.innerText = totalQty;
+            badge.className = `absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white transition-transform ${totalQty > 0 ? 'scale-100' : 'scale-0'}`;
+
+            const list = document.getElementById('cartItemsList');
+            if (cart.length === 0) {
+                list.innerHTML = '<div class="text-center py-8 text-xs text-slate-400">购物车是空的</div>';
+            } else {
+                list.innerHTML = cart.map(item => `
+                    <div class="flex items-center gap-3 p-2 bg-slate-50 rounded-xl">
+                        <img src="${item.coverImg}" class="w-12 h-12 rounded-lg object-cover">
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-xs font-bold truncate">${item.title}</h4>
+                            <span class="text-xs font-bold text-brand-600">¥${item.price}</span>
+                        </div>
+                        <div class="flex items-center gap-1 border border-slate-200 rounded-md">
+                            <button onclick="updateCartQty('${item.id}', -1)" class="px-2 py-0.5 text-xs">-</button>
+                            <span class="text-xs px-1 font-bold">${item.qty}</span>
+                            <button onclick="updateCartQty('${item.id}', 1)" class="px-2 py-0.5 text-xs">+</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+            document.getElementById('cartSubtotal').innerText = `¥${total.toFixed(2)}`;
+            document.getElementById('cartTotal').innerText = `¥${total.toFixed(2)}`;
+        }
+
+        function updateCartQty(id, delta) {
+            const item = cart.find(i => i.id === id);
+            if (!item) return;
+            item.qty += delta;
+            if (item.qty <= 0) { cart = cart.filter(i => i.id !== id); }
+            saveCart();
+        }
+
+        function toggleCartDrawer(open) {
+            const drawer = document.getElementById('cartDrawer');
+            const panel = document.getElementById('cartDrawerPanel');
+            if (open) {
+                drawer.classList.remove('opacity-0', 'pointer-events-none');
+                panel.classList.remove('translate-x-full');
+            } else {
+                drawer.classList.add('opacity-0', 'pointer-events-none');
+                panel.classList.add('translate-x-full');
+            }
+        }
+
+        function checkout() {
+            if (cart.length === 0) return alert('购物车空空如也！');
+            alert('🎉 模拟结算成功！');
+            cart = [];
+            saveCart();
+            toggleCartDrawer(false);
+        }
+
+        function openAdminModal() {
+            document.getElementById('adminAuthView').classList.remove('hidden');
+            document.getElementById('adminMainView').classList.add('hidden');
+            document.getElementById('adminPasswordInput').value = '';
+            document.getElementById('adminModal').classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        function closeAdminModal() { document.getElementById('adminModal').classList.add('opacity-0', 'pointer-events-none'); }
+
+        function verifyAdminPass() {
+            const input = document.getElementById('adminPasswordInput').value;
+            if (input === 'admin123') {
+                document.getElementById('adminAuthView').classList.add('hidden');
+                document.getElementById('adminMainView').classList.remove('hidden');
+                renderAdminTable();
+            } else {
+                alert('密码错误！(默认: admin123)');
+            }
+        }
+
+        function renderAdminTable() {
+            document.getElementById('adminProdCount').innerText = products.length;
+            const container = document.getElementById('adminProductTable');
+            container.innerHTML = products.map(p => `
+                <div class="flex items-center justify-between p-2.5 bg-white rounded-xl border border-slate-200 text-xs">
+                    <div class="flex items-center gap-3">
+                        <img src="${p.coverImg}" class="w-10 h-10 rounded-lg object-cover" onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&q=80'">
+                        <div>
+                            <div class="font-bold text-slate-800">${p.title}</div>
+                            <div class="text-slate-400">¥${p.price} | 分类: ${p.category} | 详情图: ${(p.detailImgs||[]).length} 张</div>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="editProduct('${p.id}')" class="px-2 py-1 bg-slate-100 hover:bg-brand-600 hover:text-white rounded transition">编辑</button>
+                        <button onclick="deleteProduct('${p.id}')" class="px-2 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200 transition">删除</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function saveProduct() {
+            const id = document.getElementById('editProductId').value || Date.now().toString();
+            const title = document.getElementById('prodTitle').value.trim();
+            const category = document.getElementById('prodCategory').value.trim() || '通用';
+            const price = parseFloat(document.getElementById('prodPrice').value) || 0;
+            const originalPrice = parseFloat(document.getElementById('prodOriginalPrice').value) || null;
+            
+            // 修复：如果没有填主图链接，默认采用一张中性产品/家具图，而不是耳机图
+            let coverImg = document.getElementById('prodCoverImg').value.trim();
+            if (!coverImg) {
+                coverImg = 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&q=80';
+            }
+
+            const detailImgsRaw = document.getElementById('prodDetailImgs').value;
+            const desc = document.getElementById('prodDesc').value.trim();
+
+            if (!title) return alert('请输入商品名称');
+
+            const detailImgs = detailImgsRaw.split(/[\n,]/).map(s => s.trim()).filter(s => s.length > 0);
+            const existingIndex = products.findIndex(p => p.id === id);
+            const newProd = { id, title, category, price, originalPrice, coverImg, detailImgs, desc, stock: 99 };
+
+            if (existingIndex >= 0) { products[existingIndex] = newProd; } 
+            else { products.unshift(newProd); }
+
+            localStorage.setItem('luxestore_products', JSON.stringify(products));
+            resetAdminForm();
+            renderAdminTable();
+            renderCategories();
+            renderProducts();
+            alert('保存成功！商品与本地图片已永久缓存。');
+        }
+
+        function editProduct(id) {
+            const p = products.find(prod => prod.id === id);
+            if (!p) return;
+            document.getElementById('editProductId').value = p.id;
+            document.getElementById('prodTitle').value = p.title;
+            document.getElementById('prodCategory').value = p.category;
+            document.getElementById('prodPrice').value = p.price;
+            document.getElementById('prodOriginalPrice').value = p.originalPrice || '';
+            document.getElementById('prodCoverImg').value = p.coverImg;
+            document.getElementById('prodDetailImgs').value = (p.detailImgs || []).join('\n');
+            document.getElementById('prodDesc').value = p.desc || '';
+            document.getElementById('formTitle').innerText = '编辑商品数据';
+        }
+
+        function deleteProduct(id) {
+            if (!confirm('确定要删除吗？')) return;
+            products = products.filter(p => p.id !== id);
+            localStorage.setItem('luxestore_products', JSON.stringify(products));
+            renderAdminTable();
+            renderCategories();
+            renderProducts();
+        }
+
+        function resetAdminForm() {
+            document.getElementById('editProductId').value = '';
+            document.getElementById('prodTitle').value = '';
+            document.getElementById('prodCategory').value = '';
+            document.getElementById('prodPrice').value = '';
+            document.getElementById('prodOriginalPrice').value = '';
+            document.getElementById('prodCoverImg').value = '';
+            document.getElementById('prodDetailImgs').value = '';
+            document.getElementById('prodDesc').value = '';
+            document.getElementById('formTitle').innerText = '添加/更新商品';
+        }
+
+        function resetToDefaultData() {
+            if (!confirm('确认恢复默认预设商品吗？')) return;
+            localStorage.setItem('luxestore_products', JSON.stringify(DEFAULT_PRODUCTS));
+            products = DEFAULT_PRODUCTS;
+            renderAdminTable();
+            renderCategories();
+            renderProducts();
+        }
+
+        function scrollToProducts() { document.getElementById('productSection').scrollIntoView({ behavior: 'smooth' }); }
+        function toggleDarkMode() { document.documentElement.classList.toggle('dark'); }
+    </script>
+</body>
+</html>
