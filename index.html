@@ -1,66 +1,42 @@
 <!DOCTYPE html>
-<html lang="zh-CN" class="scroll-smooth">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LuxeStore - 极简高奢电商 & 详情图预览测试平台</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
-                        brand: {
-                            50: '#f0f7ff',
-                            100: '#e0effe',
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                            700: '#1d4ed8',
-                            900: '#0f172a'
-                        }
+                        brand: { 50: '#f0f7ff', 100: '#e0effe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 900: '#0f172a' }
                     },
-                    fontFamily: {
-                        sans: ['Plus Jakarta Sans', 'sans-serif']
-                    }
+                    fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] }
                 }
             }
         }
     </script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* 保底内联基础样式，防止 CDN 偶尔挂掉导致完全无样式 */
-        body { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-        .glass {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-        }
-        .dark .glass {
-            background: rgba(15, 23, 42, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
+        /* 强制兜底样式，防止CDN失效或本地打开时样式崩塌 */
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #1e293b; margin: 0; padding: 0; min-height: 100vh; display: flex; flex-direction: column; }
+        .glass { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(226, 232, 240, 0.8); }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        .preview-wrapper {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            margin: 0 auto;
-        }
-        .view-mobile { max-width: 414px; border-radius: 40px; border: 12px solid #1e293b; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35); }
-        .view-tablet { max-width: 768px; border-radius: 24px; border: 10px solid #1e293b; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+        .preview-wrapper { transition: all 0.3s ease; margin: 0 auto; width: 100%; }
+        .view-mobile { max-width: 414px; border-radius: 36px; border: 12px solid #0f172a; margin-top: 10px; margin-bottom: 10px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.4); overflow: hidden; }
+        .view-tablet { max-width: 768px; border-radius: 24px; border: 10px solid #0f172a; margin-top: 10px; margin-bottom: 10px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.3); overflow: hidden; }
         .view-desktop { max-width: 100%; border-radius: 0; border: none; }
     </style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans min-h-screen flex flex-col transition-colors duration-300">
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col">
 
-    <!-- 顶部设备视角模拟切换工具栏 -->
-    <div id="deviceSimBar" class="bg-slate-900 text-slate-300 text-xs py-2 px-4 flex justify-between items-center z-50 sticky top-0 border-b border-slate-800">
+    <!-- 顶部设备模拟切换工具栏 -->
+    <div class="bg-slate-900 text-slate-300 text-xs py-2 px-4 flex justify-between items-center z-50 sticky top-0 border-b border-slate-800">
         <div class="flex items-center gap-2">
             <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
             <span class="font-medium text-slate-200">详情图视觉预览与电商测试系统</span>
@@ -68,15 +44,15 @@
         <div class="flex items-center gap-1 bg-slate-800 p-1 rounded-lg border border-slate-700">
             <button onclick="setViewport('desktop')" id="btnDesk" class="px-3 py-1 rounded-md text-xs font-semibold bg-brand-600 text-white transition"><i class="fa-solid fa-desktop mr-1"></i> 桌面端</button>
             <button onclick="setViewport('tablet')" id="btnTab" class="px-3 py-1 rounded-md text-xs font-semibold hover:text-white transition"><i class="fa-solid fa-tablet-screen-button mr-1"></i> 平板端</button>
-            <button onclick="setViewport('mobile')" id="btnMob" class="px-3 py-1 rounded-md text-xs font-semibold hover:text-white transition"><i class="fa-solid fa-mobile-screen-button mr-1"></i> 手机端 (测试详情图)</button>
+            <button onclick="setViewport('mobile')" id="btnMob" class="px-3 py-1 rounded-md text-xs font-semibold hover:text-white transition"><i class="fa-solid fa-mobile-screen-button mr-1"></i> 手机端 (测切图)</button>
         </div>
     </div>
 
     <!-- 主包裹容器 -->
-    <div id="appContainer" class="preview-wrapper view-desktop min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 relative overflow-hidden">
+    <div id="appContainer" class="preview-wrapper view-desktop min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 relative">
 
         <!-- 顶部导航栏 -->
-        <header class="sticky top-0 z-40 glass border-b border-slate-200/50 dark:border-slate-800/50 transition-all">
+        <header class="sticky top-0 z-40 glass dark:bg-slate-900/80 dark:border-slate-800 transition-all">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
                 <a href="#" class="flex items-center gap-2 font-extrabold text-xl tracking-tight text-brand-600 dark:text-brand-500">
                     <div class="w-9 h-9 rounded-xl bg-brand-600 text-white flex items-center justify-center shadow-lg shadow-brand-500/30">
@@ -87,7 +63,7 @@
 
                 <div class="hidden sm:flex items-center flex-1 max-w-md mx-8 relative">
                     <input type="text" id="searchInput" oninput="handleSearch()" placeholder="搜索商品名称或关键词..." 
-                        class="w-full pl-10 pr-4 py-2 text-sm rounded-full bg-slate-100 dark:bg-slate-900 border-none focus:ring-2 focus:ring-brand-500 transition-all outline-none">
+                        class="w-full pl-10 pr-4 py-2 text-sm rounded-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 focus:ring-2 focus:ring-brand-500 transition-all outline-none">
                     <i class="fa-solid fa-magnifying-glass absolute left-3.5 text-slate-400 text-sm"></i>
                 </div>
 
@@ -96,14 +72,14 @@
                         <i id="themeIcon" class="fa-solid fa-moon"></i>
                     </button>
 
-                    <button onclick="openAdminModal()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition">
+                    <button onclick="openAdminModal()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 transition">
                         <i class="fa-solid fa-sliders text-brand-500"></i>
                         <span class="hidden sm:inline">商家后台管理</span>
                     </button>
 
                     <button onclick="toggleCartDrawer(true)" class="relative w-10 h-10 rounded-full bg-brand-600 text-white flex items-center justify-center shadow-md shadow-brand-500/20 hover:bg-brand-700 transition">
                         <i class="fa-solid fa-bag-shopping"></i>
-                        <span id="cartBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-900 scale-0 transition-transform">0</span>
+                        <span id="cartBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white scale-0 transition-transform">0</span>
                     </button>
                 </div>
             </div>
@@ -111,9 +87,7 @@
 
         <!-- 主内容区域 -->
         <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            
             <div class="relative rounded-3xl overflow-hidden mb-8 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-8 sm:p-12 shadow-2xl flex flex-col justify-center">
-                <div class="absolute inset-0 opacity-20 bg-[radial-gradient(#3b82f6_1px,transparent_1px)] [background-size:16px_16px]"></div>
                 <div class="relative z-10 max-w-xl">
                     <span class="inline-block px-3 py-1 rounded-full bg-brand-500/20 text-brand-300 text-xs font-semibold uppercase tracking-wider mb-3 backdrop-blur-md border border-brand-500/30">
                         电商美工 & 详情图实时测试引擎
@@ -133,11 +107,10 @@
 
                 <div class="flex items-center gap-2 self-end sm:self-auto">
                     <span class="text-xs text-slate-500">排序:</span>
-                    <select id="sortSelect" onchange="renderProducts()" class="text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-brand-500">
+                    <select id="sortSelect" onchange="renderProducts()" class="text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 outline-none">
                         <option value="default">默认推荐</option>
                         <option value="price-asc">价格由低到高</option>
                         <option value="price-desc">价格由高到低</option>
-                        <option value="sales">销量优先</option>
                     </select>
                 </div>
             </div>
@@ -147,8 +120,8 @@
 
             <!-- 空状态显示 -->
             <div id="emptyState" class="hidden py-16 text-center">
-                <i class="fa-solid fa-box-open text-5xl text-slate-300 dark:text-slate-700 mb-4"></i>
-                <h3 class="text-lg font-semibold text-slate-600 dark:text-slate-400">未找到相关商品</h3>
+                <i class="fa-solid fa-box-open text-5xl text-slate-300 mb-4"></i>
+                <h3 class="text-lg font-semibold text-slate-600">未找到相关商品</h3>
                 <p class="text-sm text-slate-400 mt-1">尝试更换搜索词或选择其他分类</p>
             </div>
         </main>
@@ -161,12 +134,12 @@
         </footer>
     </div>
 
-    <!-- 弹窗组件：商品详情模态框 -->
+    <!-- 弹窗：商品详情模态框 -->
     <div id="detailModal" class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300" onclick="if(event.target === this) closeDetailModal()">
         <div class="bg-white dark:bg-slate-900 w-full max-w-4xl max-h-[92vh] rounded-3xl shadow-2xl overflow-hidden flex flex-col transform scale-95 transition-transform duration-300" id="detailModalCard">
-            <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/50">
+            <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50">
                 <span class="text-xs font-bold uppercase tracking-wider text-brand-600" id="modalCategory">分类名称</span>
-                <button onclick="closeDetailModal()" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-800 dark:hover:text-white flex items-center justify-center transition">
+                <button onclick="closeDetailModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:text-slate-800 flex items-center justify-center transition">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
@@ -174,7 +147,7 @@
             <div class="flex-1 overflow-y-auto p-4 sm:p-8 space-y-8">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 items-start">
                     <div class="space-y-3">
-                        <div class="aspect-square rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-800">
+                        <div class="aspect-square rounded-2xl overflow-hidden bg-slate-100 border border-slate-200">
                             <img id="modalMainImg" src="" class="w-full h-full object-cover">
                         </div>
                         <div id="modalThumbnails" class="flex gap-2 overflow-x-auto py-1"></div>
@@ -186,15 +159,15 @@
                             <span class="text-3xl font-extrabold text-brand-600" id="modalPrice">¥0.00</span>
                             <span class="text-sm text-slate-400 line-through" id="modalOriginalPrice">¥0.00</span>
                         </div>
-                        <p id="modalDesc" class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">商品描述信息...</p>
+                        <p id="modalDesc" class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">商品描述...</p>
 
-                        <div class="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-4">
+                        <div class="pt-4 border-t border-slate-100 space-y-4">
                             <div class="flex items-center gap-4">
                                 <span class="text-xs font-semibold text-slate-500">选择数量:</span>
-                                <div class="flex items-center border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden">
-                                    <button onclick="adjustDetailQty(-1)" class="px-3 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-sm font-bold">-</button>
+                                <div class="flex items-center border border-slate-200 rounded-lg overflow-hidden">
+                                    <button onclick="adjustDetailQty(-1)" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-sm font-bold">-</button>
                                     <span id="detailQty" class="px-4 text-sm font-semibold">1</span>
-                                    <button onclick="adjustDetailQty(1)" class="px-3 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-sm font-bold">+</button>
+                                    <button onclick="adjustDetailQty(1)" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-sm font-bold">+</button>
                                 </div>
                                 <span class="text-xs text-slate-400">库存: <span id="modalStock">99</span> 件</span>
                             </div>
@@ -208,7 +181,7 @@
                     </div>
                 </div>
 
-                <div class="pt-8 border-t border-slate-200 dark:border-slate-800">
+                <div class="pt-8 border-t border-slate-200">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-lg font-bold flex items-center gap-2">
                             <i class="fa-solid fa-circle-info text-brand-500"></i> 商品详情说明切图 (测试流)
@@ -216,7 +189,7 @@
                         <span class="text-xs text-slate-400">提示：以下为切图连续拼接效果</span>
                     </div>
 
-                    <div id="detailImageStream" class="w-full bg-slate-100 dark:bg-slate-950 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 space-y-0"></div>
+                    <div id="detailImageStream" class="w-full bg-slate-100 rounded-2xl overflow-hidden border border-slate-200 space-y-0"></div>
                 </div>
             </div>
         </div>
@@ -226,14 +199,14 @@
     <div id="cartDrawer" class="fixed inset-0 z-50 pointer-events-none opacity-0 transition-opacity duration-300">
         <div class="absolute inset-0 bg-black/50 backdrop-blur-xs" onclick="toggleCartDrawer(false)"></div>
         <div class="absolute right-0 top-0 bottom-0 w-full max-w-md bg-white dark:bg-slate-900 shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 pointer-events-auto" id="cartDrawerPanel">
-            <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+            <div class="p-4 border-b border-slate-100 flex justify-between items-center">
                 <h3 class="font-bold text-lg flex items-center gap-2"><i class="fa-solid fa-bag-shopping text-brand-500"></i> 我的购物车</h3>
                 <button onclick="toggleCartDrawer(false)" class="text-slate-400 hover:text-slate-600 p-2"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
 
             <div id="cartItemsList" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
 
-            <div class="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 space-y-3">
+            <div class="p-4 border-t border-slate-100 bg-slate-50 space-y-3">
                 <div class="space-y-1 text-sm">
                     <div class="flex justify-between text-slate-500"><span>小计:</span><span id="cartSubtotal">¥0.00</span></div>
                     <div class="flex justify-between font-bold text-lg text-slate-900 dark:text-white"><span>合计:</span><span id="cartTotal" class="text-brand-600">¥0.00</span></div>
@@ -246,8 +219,7 @@
     <!-- 模态框：商家后台管理系统 -->
     <div id="adminModal" class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300" onclick="if(event.target === this) closeAdminModal()">
         <div class="bg-white dark:bg-slate-900 w-full max-w-3xl max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden flex flex-col relative">
-            
-            <button onclick="closeAdminModal()" class="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-800 dark:hover:text-white flex items-center justify-center transition">
+            <button onclick="closeAdminModal()" class="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:text-slate-800 flex items-center justify-center transition">
                 <i class="fa-solid fa-xmark"></i>
             </button>
 
@@ -257,46 +229,46 @@
                     <i class="fa-solid fa-lock"></i>
                 </div>
                 <h3 class="text-xl font-bold">后台管理权限验证</h3>
-                <p class="text-xs text-slate-400">请输入控制台管理密码（默认密码：<code class="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-brand-500">admin123</code>）</p>
+                <p class="text-xs text-slate-400">请输入控制台管理密码（默认密码：<code class="bg-slate-100 px-1.5 py-0.5 rounded text-brand-500">admin123</code>）</p>
                 <div class="max-w-xs mx-auto space-y-3">
-                    <input type="password" id="adminPasswordInput" placeholder="请输入密码" class="w-full px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border-none text-center outline-none focus:ring-2 focus:ring-brand-500" onkeydown="if(event.key==='Enter') verifyAdminPass()">
+                    <input type="password" id="adminPasswordInput" placeholder="请输入密码" class="w-full px-4 py-2 rounded-xl bg-slate-100 border-none text-center outline-none focus:ring-2 focus:ring-brand-500" onkeydown="if(event.key==='Enter') verifyAdminPass()">
                     <button onclick="verifyAdminPass()" class="w-full py-2.5 bg-brand-600 text-white font-semibold rounded-xl hover:bg-brand-700 transition">解锁管理面板</button>
                 </div>
             </div>
 
             <!-- 控制台主视图 -->
             <div id="adminMainView" class="hidden flex-1 flex flex-col overflow-hidden">
-                <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+                <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
                     <h3 class="font-bold text-lg"><i class="fa-solid fa-sliders text-brand-500 mr-2"></i>商品与详情图管理台</h3>
                     <button onclick="closeAdminModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
                 </div>
 
                 <div class="flex-1 overflow-y-auto p-6 space-y-6">
-                    <div class="bg-slate-50 dark:bg-slate-800/40 p-4 rounded-2xl border border-slate-200/60 dark:border-slate-800 space-y-4">
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-4">
                         <h4 class="font-bold text-sm text-brand-600 flex items-center gap-1.5" id="formTitle">
                             <i class="fa-solid fa-plus-circle"></i> 添加/更新商品
                         </h4>
                         <input type="hidden" id="editProductId">
                         
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <input type="text" id="prodTitle" placeholder="商品名称" class="px-3 py-2 text-sm rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 outline-none">
-                            <input type="text" id="prodCategory" placeholder="商品分类(如: 家具家居)" class="px-3 py-2 text-sm rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 outline-none">
-                            <input type="number" id="prodPrice" placeholder="销售价格 (¥)" class="px-3 py-2 text-sm rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 outline-none">
-                            <input type="number" id="prodOriginalPrice" placeholder="划线原价 (¥)" class="px-3 py-2 text-sm rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 outline-none">
+                            <input type="text" id="prodTitle" placeholder="商品名称" class="px-3 py-2 text-sm rounded-lg bg-white border border-slate-200 outline-none">
+                            <input type="text" id="prodCategory" placeholder="商品分类(如: 家具家居)" class="px-3 py-2 text-sm rounded-lg bg-white border border-slate-200 outline-none">
+                            <input type="number" id="prodPrice" placeholder="销售价格 (¥)" class="px-3 py-2 text-sm rounded-lg bg-white border border-slate-200 outline-none">
+                            <input type="number" id="prodOriginalPrice" placeholder="划线原价 (¥)" class="px-3 py-2 text-sm rounded-lg bg-white border border-slate-200 outline-none">
                         </div>
 
-                        <input type="text" id="prodCoverImg" placeholder="主图链接 URL (支持外部图床链接)" class="w-full px-3 py-2 text-sm rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 outline-none">
+                        <input type="text" id="prodCoverImg" placeholder="主图链接 URL" class="w-full px-3 py-2 text-sm rounded-lg bg-white border border-slate-200 outline-none">
 
                         <div>
-                            <label class="block text-xs font-semibold text-slate-500 mb-1">详情页图片链接 (多个请用逗号或换行分隔，多张长图会自动上下连缀):</label>
-                            <textarea id="prodDetailImgs" rows="3" placeholder="https://...&#10;https://..." class="w-full px-3 py-2 text-xs rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 outline-none font-mono"></textarea>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">详情页图片链接 (多个请用逗号或换行分隔):</label>
+                            <textarea id="prodDetailImgs" rows="3" placeholder="https://...&#10;https://..." class="w-full px-3 py-2 text-xs rounded-lg bg-white border border-slate-200 outline-none font-mono"></textarea>
                         </div>
 
-                        <textarea id="prodDesc" rows="2" placeholder="商品简短描述..." class="w-full px-3 py-2 text-sm rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 outline-none"></textarea>
+                        <textarea id="prodDesc" rows="2" placeholder="商品简短描述..." class="w-full px-3 py-2 text-sm rounded-lg bg-white border border-slate-200 outline-none"></textarea>
 
                         <div class="flex gap-2">
                             <button onclick="saveProduct()" class="px-4 py-2 bg-brand-600 text-white rounded-lg text-xs font-semibold hover:bg-brand-700 transition">保存商品</button>
-                            <button onclick="resetAdminForm()" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-xs font-semibold hover:bg-slate-300 transition">清空表单</button>
+                            <button onclick="resetAdminForm()" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold hover:bg-slate-300 transition">清空表单</button>
                         </div>
                     </div>
 
@@ -386,11 +358,18 @@
             }
         ];
 
-        let products = JSON.parse(localStorage.getItem('luxestore_products'));
-        if (!products || !Array.isArray(products) || products.length === 0) {
+        // 强力兜底初始化数据：确保初次打开或缓存损坏时自动填充默认商品
+        let products = [];
+        try {
+            const saved = localStorage.getItem('luxestore_products');
+            products = saved ? JSON.parse(saved) : DEFAULT_PRODUCTS;
+            if (!Array.isArray(products) || products.length === 0) {
+                products = DEFAULT_PRODUCTS;
+            }
+        } catch (e) {
             products = DEFAULT_PRODUCTS;
-            localStorage.setItem('luxestore_products', JSON.stringify(DEFAULT_PRODUCTS));
         }
+        localStorage.setItem('luxestore_products', JSON.stringify(products));
 
         let cart = JSON.parse(localStorage.getItem('luxestore_cart')) || [];
         let selectedCategory = '全部';
@@ -422,7 +401,7 @@
                 <button onclick="selectCategory('${cat}')" class="px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
                     selectedCategory === cat 
                         ? 'bg-brand-600 text-white shadow-md shadow-brand-500/20' 
-                        : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100'
+                        : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
                 }">
                     ${cat}
                 </button>
@@ -458,24 +437,24 @@
             empty.classList.add('hidden');
 
             grid.innerHTML = filtered.map(p => `
-                <div onclick="openDetailModal('${p.id}')" class="group bg-white dark:bg-slate-900 rounded-2xl p-3 border border-slate-200/60 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col justify-between">
+                <div onclick="openDetailModal('${p.id}')" class="group bg-white rounded-2xl p-3 border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col justify-between">
                     <div class="space-y-3">
-                        <div class="aspect-square rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 relative">
+                        <div class="aspect-square rounded-xl overflow-hidden bg-slate-100 relative">
                             <img src="${p.coverImg}" alt="${p.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80'">
                             <span class="absolute top-2 left-2 bg-black/40 backdrop-blur-md text-white text-[10px] px-2 py-0.5 rounded-full">${p.category || '通用'}</span>
                         </div>
                         <div>
-                            <h3 class="font-bold text-sm text-slate-900 dark:text-white line-clamp-1 group-hover:text-brand-600 transition">${p.title}</h3>
+                            <h3 class="font-bold text-sm text-slate-900 line-clamp-1 group-hover:text-brand-600 transition">${p.title}</h3>
                             <p class="text-xs text-slate-400 line-clamp-1 mt-1">${p.desc || ''}</p>
                         </div>
                     </div>
-                    <div class="flex items-center justify-between pt-3 mt-2 border-t border-slate-100 dark:border-slate-800/50">
+                    <div class="flex items-center justify-between pt-3 mt-2 border-t border-slate-100">
                         <div>
                             <span class="text-xs font-bold text-brand-600">¥</span>
-                            <span class="text-base font-extrabold text-slate-900 dark:text-white">${p.price}</span>
+                            <span class="text-base font-extrabold text-slate-900">${p.price}</span>
                             ${p.originalPrice ? `<span class="text-[10px] text-slate-400 line-through ml-1">¥${p.originalPrice}</span>` : ''}
                         </div>
-                        <button onclick="event.stopPropagation(); addToCart('${p.id}')" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-200 hover:bg-brand-600 hover:text-white flex items-center justify-center transition">
+                        <button onclick="event.stopPropagation(); addToCart('${p.id}')" class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 hover:bg-brand-600 hover:text-white flex items-center justify-center transition">
                             <i class="fa-solid fa-plus text-xs"></i>
                         </button>
                     </div>
@@ -483,14 +462,11 @@
             `).join('');
         }
 
-        function handleSearch() {
-            renderProducts();
-        }
+        function handleSearch() { renderProducts(); }
 
         function setViewport(type) {
             const wrapper = document.getElementById('appContainer');
-            wrapper.className = `preview-wrapper view-${type} min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 relative overflow-hidden`;
-            
+            wrapper.className = `preview-wrapper view-${type} min-h-screen flex flex-col bg-slate-50 relative`;
             ['Desk', 'Tab', 'Mob'].forEach(id => {
                 const btn = document.getElementById(`btn${id}`);
                 btn.className = "px-3 py-1 rounded-md text-xs font-semibold hover:text-white transition";
@@ -556,14 +532,9 @@
         function addToCart(id, qty = 1) {
             const prod = products.find(p => p.id === id);
             if (!prod) return;
-
             const existing = cart.find(item => item.id === id);
-            if (existing) {
-                existing.qty += qty;
-            } else {
-                cart.push({ id: prod.id, title: prod.title, price: prod.price, coverImg: prod.coverImg, qty: qty });
-            }
-
+            if (existing) { existing.qty += qty; } 
+            else { cart.push({ id: prod.id, title: prod.title, price: prod.price, coverImg: prod.coverImg, qty: qty }); }
             saveCart();
             toggleCartDrawer(true);
         }
@@ -577,20 +548,20 @@
             const badge = document.getElementById('cartBadge');
             const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
             badge.innerText = totalQty;
-            badge.className = `absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-900 transition-transform ${totalQty > 0 ? 'scale-100' : 'scale-0'}`;
+            badge.className = `absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white transition-transform ${totalQty > 0 ? 'scale-100' : 'scale-0'}`;
 
             const list = document.getElementById('cartItemsList');
             if (cart.length === 0) {
                 list.innerHTML = '<div class="text-center py-8 text-xs text-slate-400">购物车是空的</div>';
             } else {
                 list.innerHTML = cart.map(item => `
-                    <div class="flex items-center gap-3 p-2 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+                    <div class="flex items-center gap-3 p-2 bg-slate-50 rounded-xl">
                         <img src="${item.coverImg}" class="w-12 h-12 rounded-lg object-cover">
                         <div class="flex-1 min-w-0">
                             <h4 class="text-xs font-bold truncate">${item.title}</h4>
                             <span class="text-xs font-bold text-brand-600">¥${item.price}</span>
                         </div>
-                        <div class="flex items-center gap-1 border border-slate-200 dark:border-slate-700 rounded-md">
+                        <div class="flex items-center gap-1 border border-slate-200 rounded-md">
                             <button onclick="updateCartQty('${item.id}', -1)" class="px-2 py-0.5 text-xs">-</button>
                             <span class="text-xs px-1 font-bold">${item.qty}</span>
                             <button onclick="updateCartQty('${item.id}', 1)" class="px-2 py-0.5 text-xs">+</button>
@@ -608,9 +579,7 @@
             const item = cart.find(i => i.id === id);
             if (!item) return;
             item.qty += delta;
-            if (item.qty <= 0) {
-                cart = cart.filter(i => i.id !== id);
-            }
+            if (item.qty <= 0) { cart = cart.filter(i => i.id !== id); }
             saveCart();
         }
 
@@ -628,7 +597,7 @@
 
         function checkout() {
             if (cart.length === 0) return alert('购物车空空如也！');
-            alert('🎉 模拟结算成功！感谢测试！');
+            alert('🎉 模拟结算成功！');
             cart = [];
             saveCart();
             toggleCartDrawer(false);
@@ -641,10 +610,112 @@
             document.getElementById('adminModal').classList.remove('opacity-0', 'pointer-events-none');
         }
 
-        function closeAdminModal() {
-            document.getElementById('adminModal').classList.add('opacity-0', 'pointer-events-none');
-        }
+        function closeAdminModal() { document.getElementById('adminModal').classList.add('opacity-0', 'pointer-events-none'); }
 
         function verifyAdminPass() {
             const input = document.getElementById('adminPasswordInput').value;
-            if (input === 'admin123')
+            if (input === 'admin123') {
+                document.getElementById('adminAuthView').classList.add('hidden');
+                document.getElementById('adminMainView').classList.remove('hidden');
+                renderAdminTable();
+            } else {
+                alert('密码错误！(默认: admin123)');
+            }
+        }
+
+        function renderAdminTable() {
+            document.getElementById('adminProdCount').innerText = products.length;
+            const container = document.getElementById('adminProductTable');
+            container.innerHTML = products.map(p => `
+                <div class="flex items-center justify-between p-2.5 bg-white rounded-xl border border-slate-200 text-xs">
+                    <div class="flex items-center gap-3">
+                        <img src="${p.coverImg}" class="w-10 h-10 rounded-lg object-cover" onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&q=80'">
+                        <div>
+                            <div class="font-bold text-slate-800">${p.title}</div>
+                            <div class="text-slate-400">¥${p.price} | 分类: ${p.category} | 详情图: ${(p.detailImgs||[]).length} 张</div>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="editProduct('${p.id}')" class="px-2 py-1 bg-slate-100 hover:bg-brand-600 hover:text-white rounded transition">编辑</button>
+                        <button onclick="deleteProduct('${p.id}')" class="px-2 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200 transition">删除</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function saveProduct() {
+            const id = document.getElementById('editProductId').value || Date.now().toString();
+            const title = document.getElementById('prodTitle').value.trim();
+            const category = document.getElementById('prodCategory').value.trim() || '通用';
+            const price = parseFloat(document.getElementById('prodPrice').value) || 0;
+            const originalPrice = parseFloat(document.getElementById('prodOriginalPrice').value) || null;
+            const coverImg = document.getElementById('prodCoverImg').value.trim() || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80';
+            const detailImgsRaw = document.getElementById('prodDetailImgs').value;
+            const desc = document.getElementById('prodDesc').value.trim();
+
+            if (!title) return alert('请输入商品名称');
+
+            const detailImgs = detailImgsRaw.split(/[\n,]/).map(s => s.trim()).filter(s => s.length > 0);
+            const existingIndex = products.findIndex(p => p.id === id);
+            const newProd = { id, title, category, price, originalPrice, coverImg, detailImgs, desc, stock: 99 };
+
+            if (existingIndex >= 0) { products[existingIndex] = newProd; } 
+            else { products.unshift(newProd); }
+
+            localStorage.setItem('luxestore_products', JSON.stringify(products));
+            resetAdminForm();
+            renderAdminTable();
+            renderCategories();
+            renderProducts();
+            alert('保存成功！商品与详情图已持久缓存。');
+        }
+
+        function editProduct(id) {
+            const p = products.find(prod => prod.id === id);
+            if (!p) return;
+            document.getElementById('editProductId').value = p.id;
+            document.getElementById('prodTitle').value = p.title;
+            document.getElementById('prodCategory').value = p.category;
+            document.getElementById('prodPrice').value = p.price;
+            document.getElementById('prodOriginalPrice').value = p.originalPrice || '';
+            document.getElementById('prodCoverImg').value = p.coverImg;
+            document.getElementById('prodDetailImgs').value = (p.detailImgs || []).join('\n');
+            document.getElementById('prodDesc').value = p.desc || '';
+            document.getElementById('formTitle').innerText = '编辑商品数据';
+        }
+
+        function deleteProduct(id) {
+            if (!confirm('确定要删除吗？')) return;
+            products = products.filter(p => p.id !== id);
+            localStorage.setItem('luxestore_products', JSON.stringify(products));
+            renderAdminTable();
+            renderCategories();
+            renderProducts();
+        }
+
+        function resetAdminForm() {
+            document.getElementById('editProductId').value = '';
+            document.getElementById('prodTitle').value = '';
+            document.getElementById('prodCategory').value = '';
+            document.getElementById('prodPrice').value = '';
+            document.getElementById('prodOriginalPrice').value = '';
+            document.getElementById('prodCoverImg').value = '';
+            document.getElementById('prodDetailImgs').value = '';
+            document.getElementById('prodDesc').value = '';
+            document.getElementById('formTitle').innerText = '添加/更新商品';
+        }
+
+        function resetToDefaultData() {
+            if (!confirm('确认恢复默认预设商品吗？')) return;
+            localStorage.setItem('luxestore_products', JSON.stringify(DEFAULT_PRODUCTS));
+            products = DEFAULT_PRODUCTS;
+            renderAdminTable();
+            renderCategories();
+            renderProducts();
+        }
+
+        function scrollToProducts() { document.getElementById('productSection').scrollIntoView({ behavior: 'smooth' }); }
+        function toggleDarkMode() { document.documentElement.classList.toggle('dark'); }
+    </script>
+</body>
+</html>
