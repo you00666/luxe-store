@@ -28,7 +28,6 @@
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .preview-wrapper { transition: all 0.3s ease; margin: 0 auto; width: 100%; }
         
-        /* 动态手机外壳尺寸支持 */
         .view-mobile { width: 100%; max-width: var(--mobile-width, 414px); border-radius: 36px; border: 12px solid #0f172a; margin-top: 10px; margin-bottom: 10px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.4); overflow: hidden; }
         .view-tablet { max-width: 768px; border-radius: 24px; border: 10px solid #0f172a; margin-top: 10px; margin-bottom: 10px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.3); overflow: hidden; }
         .view-desktop { max-width: 100%; border-radius: 0; border: none; }
@@ -47,7 +46,6 @@
             <button onclick="setViewport('tablet')" id="btnTab" class="px-3 py-1 rounded-md text-xs font-semibold hover:text-white transition"><i class="fa-solid fa-tablet-screen-button mr-1"></i> 平板端</button>
             <button onclick="setViewport('mobile')" id="btnMob" class="px-3 py-1 rounded-md text-xs font-semibold hover:text-white transition"><i class="fa-solid fa-mobile-screen-button mr-1"></i> 手机端</button>
             
-            <!-- 🌟 新增：手机尺寸自定义下拉选择器 -->
             <select id="mobileSizeSelect" onchange="changeMobileSize(this.value)" class="bg-slate-700 text-slate-200 text-xs px-2 py-1 rounded-md outline-none border border-slate-600 cursor-pointer hover:bg-slate-600 transition">
                 <option value="414">标准手机 (414px)</option>
                 <option value="390">iPhone 14/15/16 (390px)</option>
@@ -202,7 +200,7 @@
                         <span class="text-xs text-slate-400">提示：以下为切图连续拼接效果</span>
                     </div>
 
-                    <div id="detailImageStream" class="w-full bg-slate-100 rounded-2xl overflow-hidden border border-slate-200 space-y-0"></div>
+                    <div id="detailImageStream" class="w-full bg-slate-100 rounded-2xl overflow-hidden border border-slate-200 space-y-0 min-h-[100px] flex flex-col items-center justify-center"></div>
                 </div>
             </div>
         </div>
@@ -285,7 +283,7 @@
                         <!-- 详情图设置 -->
                         <div>
                             <label class="block text-xs font-semibold text-slate-500 mb-1">详情页切图 (支持批量选择上传本地图片):</label>
-                            <textarea id="prodDetailImgs" rows="3" placeholder="https://... 或点击下方选择本地图片" class="w-full px-3 py-2 text-xs rounded-lg bg-white border border-slate-200 outline-none font-mono mb-2"></textarea>
+                            <textarea id="prodDetailImgs" rows="3" placeholder="点击下方选择本地图片批量上传..." class="w-full px-3 py-2 text-xs rounded-lg bg-white border border-slate-200 outline-none font-mono mb-2"></textarea>
                             <label class="inline-flex items-center gap-1 px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-semibold rounded-lg cursor-pointer transition">
                                 <i class="fa-solid fa-images"></i> 批量选择本地切图文件上传
                                 <input type="file" accept="image/*" multiple class="hidden" onchange="handleLocalDetailUpload(event)">
@@ -345,8 +343,8 @@
             }
         ];
 
-        // 图片等比例压缩核心函数
-        function compressImage(file, maxWidth = 1000, quality = 0.75) {
+        // 图片高压无损转换器
+        function compressImage(file, maxWidth = 900, quality = 0.7) {
             return new Promise((resolve) => {
                 const reader = new FileReader();
                 reader.onload = function(e) {
@@ -386,14 +384,9 @@
         } catch (e) {
             products = DEFAULT_PRODUCTS;
         }
-        localStorage.setItem('luxestore_products', JSON.stringify(products));
 
         let cart = [];
-        try {
-            cart = JSON.parse(localStorage.getItem('luxestore_cart')) || [];
-        } catch(e) {
-            cart = [];
-        }
+        try { cart = JSON.parse(localStorage.getItem('luxestore_cart')) || []; } catch(e) { cart = []; }
 
         let selectedCategory = '全部';
         let activeDetailProduct = null;
@@ -427,18 +420,16 @@
             
             const results = [];
             for (let i = 0; i < files.length; i++) {
-                const compressed = await compressImage(files[i], 1000, 0.75);
+                const compressed = await compressImage(files[i], 900, 0.7);
                 results.push(compressed);
             }
 
             const existing = textarea.value.trim();
-            const appended = results.join('\n');
-            textarea.value = existing ? existing + '\n' + appended : appended;
+            const appended = results.join('\n\n'); // 用双换行分隔
+            textarea.value = existing ? existing + '\n\n' + appended : appended;
         }
 
-        function getCategories() {
-            return ['全部', ...new Set(products.map(p => p.category || '通用'))];
-        }
+        function getCategories() { return ['全部', ...new Set(products.map(p => p.category || '通用'))]; }
 
         function renderCategories() {
             const container = document.getElementById('categoryContainer');
@@ -455,11 +446,7 @@
             `).join('');
         }
 
-        function selectCategory(cat) {
-            selectedCategory = cat;
-            renderCategories();
-            renderProducts();
-        }
+        function selectCategory(cat) { selectedCategory = cat; renderCategories(); renderProducts(); }
 
         function renderProducts() {
             const grid = document.getElementById('productGrid');
@@ -491,7 +478,7 @@
                 <div onclick="openDetailModal('${p.id}')" class="group bg-white rounded-2xl p-3 border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col justify-between">
                     <div class="space-y-3">
                         <div class="aspect-square rounded-xl overflow-hidden bg-slate-100 relative">
-                            <img src="${p.coverImg || 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&q=80'}" alt="${p.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&q=80'">
+                            <img src="${p.coverImg || ''}" alt="${p.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&q=80'">
                             <span class="absolute top-2 left-2 bg-black/40 backdrop-blur-md text-white text-[10px] px-2 py-0.5 rounded-full">${p.category || '通用'}</span>
                         </div>
                         <div>
@@ -528,7 +515,6 @@
             if(type==='mobile') { const b = document.getElementById('btnMob'); if(b) b.className = "px-3 py-1 rounded-md text-xs font-semibold bg-brand-600 text-white transition"; }
         }
 
-        // 🌟 新增：动态修改手机外壳宽度尺寸函数
         function changeMobileSize(width) {
             const container = document.getElementById('appContainer');
             container.style.setProperty('--mobile-width', width + 'px');
@@ -540,59 +526,52 @@
             if (!activeDetailProduct) return;
 
             detailQtyCount = 1;
-            const qElem = document.getElementById('detailQty');
-            if(qElem) qElem.innerText = '1';
-            const catElem = document.getElementById('modalCategory');
-            if(catElem) catElem.innerText = activeDetailProduct.category || '通用';
-            const titleElem = document.getElementById('modalTitle');
-            if(titleElem) titleElem.innerText = activeDetailProduct.title;
-            const priceElem = document.getElementById('modalPrice');
-            if(priceElem) priceElem.innerText = `¥${activeDetailProduct.price}`;
-            const origElem = document.getElementById('modalOriginalPrice');
-            if(origElem) origElem.innerText = activeDetailProduct.originalPrice ? `¥${activeDetailProduct.originalPrice}` : '';
-            const descElem = document.getElementById('modalDesc');
-            if(descElem) descElem.innerText = activeDetailProduct.desc || '';
-            const stockElem = document.getElementById('modalStock');
-            if(stockElem) stockElem.innerText = activeDetailProduct.stock || 99;
-            const mainImg = document.getElementById('modalMainImg');
-            if(mainImg) mainImg.src = activeDetailProduct.coverImg || '';
+            document.getElementById('detailQty').innerText = '1';
+            document.getElementById('modalCategory').innerText = activeDetailProduct.category || '通用';
+            document.getElementById('modalTitle').innerText = activeDetailProduct.title;
+            document.getElementById('modalPrice').innerText = `¥${activeDetailProduct.price}`;
+            document.getElementById('modalOriginalPrice').innerText = activeDetailProduct.originalPrice ? `¥${activeDetailProduct.originalPrice}` : '';
+            document.getElementById('modalDesc').innerText = activeDetailProduct.desc || '';
+            document.getElementById('modalStock').innerText = activeDetailProduct.stock || 99;
+            document.getElementById('modalMainImg').src = activeDetailProduct.coverImg || '';
 
             const thumbs = [activeDetailProduct.coverImg, ...(activeDetailProduct.detailImgs || [])];
-            const thumbContainer = document.getElementById('modalThumbnails');
-            if(thumbContainer) {
-                thumbContainer.innerHTML = thumbs.map((img) => `
-                    <img src="${img}" onclick="document.getElementById('modalMainImg').src='${img}'" class="w-12 h-12 rounded-lg object-cover border-2 border-transparent hover:border-brand-500 cursor-pointer" onerror="this.style.display='none'">
-                `).join('');
+            document.getElementById('modalThumbnails').innerHTML = thumbs.map((img) => `
+                <img src="${img}" onclick="document.getElementById('modalMainImg').src='${img}'" class="w-12 h-12 rounded-lg object-cover border-2 border-transparent hover:border-brand-500 cursor-pointer" onerror="this.style.display='none'">
+            `).join('');
+
+            // 🌟 强效安全的切图流解析渲染器
+            const detailImgStream = document.getElementById('detailImageStream');
+            let images = activeDetailProduct.detailImgs || [];
+
+            if (images.length === 0 && activeDetailProduct.coverImg) {
+                images = [activeDetailProduct.coverImg];
             }
 
-            const detailImgStream = document.getElementById('detailImageStream');
-            if(detailImgStream) {
-                const images = activeDetailProduct.detailImgs && activeDetailProduct.detailImgs.length > 0 
-                    ? activeDetailProduct.detailImgs 
-                    : [activeDetailProduct.coverImg];
-
+            if (images.length > 0) {
                 detailImgStream.innerHTML = images.map(img => `
-                    <img src="${img}" class="w-full h-auto block border-0 leading-none" loading="lazy" alt="详情切图" onerror="this.style.display='none'">
+                    <img src="${img}" class="w-full h-auto block border-0 leading-none" loading="lazy" alt="详情切图">
                 `).join('');
+            } else {
+                detailImgStream.innerHTML = `<span class="text-xs text-slate-400 py-6">暂无详情切图</span>`;
             }
 
             const modal = document.getElementById('detailModal');
             const card = document.getElementById('detailModalCard');
-            if(modal) modal.classList.remove('opacity-0', 'pointer-events-none');
-            if(card) card.classList.remove('scale-95');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            card.classList.remove('scale-95');
         }
 
         function closeDetailModal() {
             const modal = document.getElementById('detailModal');
             const card = document.getElementById('detailModalCard');
-            if(modal) modal.classList.add('opacity-0', 'pointer-events-none');
-            if(card) card.classList.add('scale-95');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            card.classList.add('scale-95');
         }
 
         function adjustDetailQty(delta) {
             detailQtyCount = Math.max(1, detailQtyCount + delta);
-            const qElem = document.getElementById('detailQty');
-            if(qElem) qElem.innerText = detailQtyCount;
+            document.getElementById('detailQty').innerText = detailQtyCount;
         }
 
         function addCurrentToCart() {
@@ -620,38 +599,32 @@
         function updateCartUI() {
             const badge = document.getElementById('cartBadge');
             const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
-            if(badge) {
-                badge.innerText = totalQty;
-                badge.className = `absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white transition-transform ${totalQty > 0 ? 'scale-100' : 'scale-0'}`;
-            }
+            badge.innerText = totalQty;
+            badge.className = `absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white transition-transform ${totalQty > 0 ? 'scale-100' : 'scale-0'}`;
 
             const list = document.getElementById('cartItemsList');
-            if(list) {
-                if (cart.length === 0) {
-                    list.innerHTML = '<div class="text-center py-8 text-xs text-slate-400">购物车是空的</div>';
-                } else {
-                    list.innerHTML = cart.map(item => `
-                        <div class="flex items-center gap-3 p-2 bg-slate-50 rounded-xl">
-                            <img src="${item.coverImg}" class="w-12 h-12 rounded-lg object-cover">
-                            <div class="flex-1 min-w-0">
-                                <h4 class="text-xs font-bold truncate">${item.title}</h4>
-                                <span class="text-xs font-bold text-brand-600">¥${item.price}</span>
-                            </div>
-                            <div class="flex items-center gap-1 border border-slate-200 rounded-md">
-                                <button onclick="updateCartQty('${item.id}', -1)" class="px-2 py-0.5 text-xs">-</button>
-                                <span class="text-xs px-1 font-bold">${item.qty}</span>
-                                <button onclick="updateCartQty('${item.id}', 1)" class="px-2 py-0.5 text-xs">+</button>
-                            </div>
+            if (cart.length === 0) {
+                list.innerHTML = '<div class="text-center py-8 text-xs text-slate-400">购物车是空的</div>';
+            } else {
+                list.innerHTML = cart.map(item => `
+                    <div class="flex items-center gap-3 p-2 bg-slate-50 rounded-xl">
+                        <img src="${item.coverImg}" class="w-12 h-12 rounded-lg object-cover">
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-xs font-bold truncate">${item.title}</h4>
+                            <span class="text-xs font-bold text-brand-600">¥${item.price}</span>
                         </div>
-                    `).join('');
-                }
+                        <div class="flex items-center gap-1 border border-slate-200 rounded-md">
+                            <button onclick="updateCartQty('${item.id}', -1)" class="px-2 py-0.5 text-xs">-</button>
+                            <span class="text-xs px-1 font-bold">${item.qty}</span>
+                            <button onclick="updateCartQty('${item.id}', 1)" class="px-2 py-0.5 text-xs">+</button>
+                        </div>
+                    </div>
+                `).join('');
             }
 
             const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
-            const subElem = document.getElementById('cartSubtotal');
-            if(subElem) subElem.innerText = `¥${total.toFixed(2)}`;
-            const totElem = document.getElementById('cartTotal');
-            if(totElem) totElem.innerText = `¥${total.toFixed(2)}`;
+            document.getElementById('cartSubtotal').innerText = `¥${total.toFixed(2)}`;
+            document.getElementById('cartTotal').innerText = `¥${total.toFixed(2)}`;
         }
 
         function updateCartQty(id, delta) {
@@ -665,7 +638,6 @@
         function toggleCartDrawer(open) {
             const drawer = document.getElementById('cartDrawer');
             const panel = document.getElementById('cartDrawerPanel');
-            if (!drawer || !panel) return;
             if (open) {
                 drawer.classList.remove('opacity-0', 'pointer-events-none');
                 panel.classList.remove('translate-x-full');
@@ -684,29 +656,21 @@
         }
 
         function openAdminModal() {
-            const authView = document.getElementById('adminAuthView');
-            const mainView = document.getElementById('adminMainView');
-            const pwdInput = document.getElementById('adminPasswordInput');
-            const adminModal = document.getElementById('adminModal');
-            if(authView) authView.classList.remove('hidden');
-            if(mainView) mainView.classList.add('hidden');
-            if(pwdInput) pwdInput.value = '';
-            if(adminModal) adminModal.classList.remove('opacity-0', 'pointer-events-none');
+            document.getElementById('adminAuthView').classList.remove('hidden');
+            document.getElementById('adminMainView').classList.add('hidden');
+            document.getElementById('adminPasswordInput').value = '';
+            document.getElementById('adminModal').classList.remove('opacity-0', 'pointer-events-none');
         }
 
         function closeAdminModal() { 
-            const adminModal = document.getElementById('adminModal');
-            if(adminModal) adminModal.classList.add('opacity-0', 'pointer-events-none'); 
+            document.getElementById('adminModal').classList.add('opacity-0', 'pointer-events-none'); 
         }
 
         function verifyAdminPass() {
-            const pwdInput = document.getElementById('adminPasswordInput');
-            const input = pwdInput ? pwdInput.value : '';
+            const input = document.getElementById('adminPasswordInput').value;
             if (input === 'admin123') {
-                const authView = document.getElementById('adminAuthView');
-                const mainView = document.getElementById('adminMainView');
-                if(authView) authView.classList.add('hidden');
-                if(mainView) mainView.classList.remove('hidden');
+                document.getElementById('adminAuthView').classList.add('hidden');
+                document.getElementById('adminMainView').classList.remove('hidden');
                 renderAdminTable();
             } else {
                 alert('密码错误！(默认: admin123)');
@@ -714,17 +678,15 @@
         }
 
         function renderAdminTable() {
-            const countElem = document.getElementById('adminProdCount');
-            if(countElem) countElem.innerText = products.length;
+            document.getElementById('adminProdCount').innerText = products.length;
             const container = document.getElementById('adminProductTable');
-            if(!container) return;
             container.innerHTML = products.map(p => `
                 <div class="flex items-center justify-between p-2.5 bg-white rounded-xl border border-slate-200 text-xs">
                     <div class="flex items-center gap-3">
                         <img src="${p.coverImg || ''}" class="w-10 h-10 rounded-lg object-cover" onerror="this.src='https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=200&q=80'">
                         <div>
                             <div class="font-bold text-slate-800">${p.title}</div>
-                            <div class="text-slate-400">¥${p.price} | 分类: ${p.category} | 详情图: ${(p.detailImgs||[]).length} 张</div>
+                            <div class="text-slate-400">¥${p.price} | 分类: ${p.category} | 详情切图: ${(p.detailImgs||[]).length} 张</div>
                         </div>
                     </div>
                     <div class="flex gap-2">
@@ -736,27 +698,23 @@
         }
 
         function saveProduct() {
-            const idElem = document.getElementById('editProductId');
-            const titleElem = document.getElementById('prodTitle');
-            const catElem = document.getElementById('prodCategory');
-            const priceElem = document.getElementById('prodPrice');
-            const origElem = document.getElementById('prodOriginalPrice');
-            const coverElem = document.getElementById('prodCoverImg');
-            const detailElem = document.getElementById('prodDetailImgs');
-            const descElem = document.getElementById('prodDesc');
-
-            const id = idElem && idElem.value ? idElem.value : Date.now().toString();
-            const title = titleElem ? titleElem.value.trim() : '';
-            const category = catElem && catElem.value.trim() ? catElem.value.trim() : '通用';
-            const price = priceElem ? parseFloat(priceElem.value) || 0 : 0;
-            const originalPrice = origElem && origElem.value ? parseFloat(origElem.value) || null : null;
-            const coverImg = coverElem && coverElem.value.trim() ? coverElem.value.trim() : 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&q=80';
-            const detailImgsRaw = detailElem ? detailElem.value : '';
-            const desc = descElem ? descElem.value.trim() : '';
+            const id = document.getElementById('editProductId').value || Date.now().toString();
+            const title = document.getElementById('prodTitle').value.trim();
+            const category = document.getElementById('prodCategory').value.trim() || '通用';
+            const price = parseFloat(document.getElementById('prodPrice').value) || 0;
+            const originalPrice = parseFloat(document.getElementById('prodOriginalPrice').value) || null;
+            const coverImg = document.getElementById('prodCoverImg').value.trim() || 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&q=80';
+            const detailImgsRaw = document.getElementById('prodDetailImgs').value;
+            const desc = document.getElementById('prodDesc').value.trim();
 
             if (!title) return alert('请输入商品名称');
 
-            const detailImgs = detailImgsRaw.split(/\r?\n/).map(s => s.trim()).filter(s => s.length > 0);
+            // 精准防损坏提取算法
+            let detailImgs = detailImgsRaw
+                .split(/\n+/)
+                .map(s => s.trim())
+                .filter(s => s.length > 10);
+
             const existingIndex = products.findIndex(p => p.id === id);
             const newProd = { id, title, category, price, originalPrice, coverImg, detailImgs, desc, stock: 99 };
 
@@ -769,9 +727,9 @@
                 renderAdminTable();
                 renderCategories();
                 renderProducts();
-                alert('🎉 保存成功！切图流已同步更新。');
+                alert('🎉 商品保存成功！请重新点击该商品预览切图。');
             } catch (err) {
-                alert('⚠️ 保存失败：图片数据量过大，请适当减少切图数量。');
+                alert('⚠️ 保存失败：当前添加的切图文件总体积过大，请控制在 3~5 张内上传。');
             }
         }
 
@@ -784,10 +742,9 @@
             document.getElementById('prodPrice').value = p.price;
             document.getElementById('prodOriginalPrice').value = p.originalPrice || '';
             document.getElementById('prodCoverImg').value = p.coverImg;
-            document.getElementById('prodDetailImgs').value = (p.detailImgs || []).join('\n');
+            document.getElementById('prodDetailImgs').value = (p.detailImgs || []).join('\n\n');
             document.getElementById('prodDesc').value = p.desc || '';
-            const fTitle = document.getElementById('formTitle');
-            if(fTitle) fTitle.innerText = '编辑商品数据';
+            document.getElementById('formTitle').innerText = '编辑商品数据';
         }
 
         function deleteProduct(id) {
@@ -808,17 +765,17 @@
             document.getElementById('prodCoverImg').value = '';
             document.getElementById('prodDetailImgs').value = '';
             document.getElementById('prodDesc').value = '';
-            const fTitle = document.getElementById('formTitle');
-            if(fTitle) fTitle.innerText = '添加/更新商品';
+            document.getElementById('formTitle').innerText = '添加/更新商品';
         }
 
         function resetToDefaultData() {
-            if (!confirm('确认恢复默认预设商品吗？')) return;
+            if (!confirm('确认清空自定义数据并恢复预设演示商品吗？')) return;
             localStorage.setItem('luxestore_products', JSON.stringify(DEFAULT_PRODUCTS));
             products = DEFAULT_PRODUCTS;
             renderAdminTable();
             renderCategories();
             renderProducts();
+            alert('已成功清空旧数据，恢复初始状态！');
         }
 
         function scrollToProducts() { 
